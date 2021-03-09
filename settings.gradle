@@ -1,0 +1,4 @@
+rootProject.name = 'memento'
+
+include('memento-base')
+include('memento-micronaut')
