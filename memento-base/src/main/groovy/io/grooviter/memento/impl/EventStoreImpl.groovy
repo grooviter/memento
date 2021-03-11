@@ -96,6 +96,7 @@ class EventStoreImpl implements EventStore {
     private <T extends Aggregate> Supplier<Optional<T>> loadFromStream(Class<T> type, UUID id) {
         return () -> Optional
             .ofNullable(type.declaredConstructors[0]?.newInstance() as Aggregate)
+            .map(agg -> agg.tap { it.id = id })
             .map(agg -> agg.applyEvents(this.listEvents(id)))
             .map(agg -> agg.asSnapshot())
     }

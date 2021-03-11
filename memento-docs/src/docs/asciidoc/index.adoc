@@ -1,0 +1,23 @@
+= Memento
+:revnumber: {memento}
+:numbered:
+:imagesDir: images/
+:baseDir: .
+:stem:
+
+[quote]
+Memento is a minimal EvenStore implementation
+
+[sidebar]
+.Apache
+****
+The *Memento* project is open sourced under the http://www.apache.org/licenses/LICENSE-2.0.html[Apache 2 License].
+****
+
+include::intro.adoc[]
+
+include::getting.adoc[]
+
+include::usage.adoc[]
+
+include::micronaut.adoc[]

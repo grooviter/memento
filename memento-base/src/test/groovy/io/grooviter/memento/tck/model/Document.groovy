@@ -4,43 +4,40 @@ import io.grooviter.memento.model.Aggregate
 import io.grooviter.memento.tck.model.events.ContentModified
 import io.grooviter.memento.tck.model.events.DocumentCreated
 import io.grooviter.memento.tck.model.events.DocumentDeleted
+import io.grooviter.memento.tck.model.events.Events
 
+//@Aggregate(events = [DocumentCreated, DocumentDeleted, ContentModified])
 class Document extends Aggregate {
-    String content = ""
-    String title = "untitled"
-    String author = "unknown"
+    String content = "", title = "untitled", author = "unknown"
 
     static Document create(String title, String author) {
         Document document = new Document(id: UUID.randomUUID())
-        DocumentCreated documentCreated =
-            new DocumentCreated(title: title, author: author, version: document.nextVersion)
-
-        document.apply(documentCreated)
-        return document
+        return document.apply(Events.created(title, author, document.nextVersion))
     }
 
     Document append(String content) {
-        this.apply(new ContentModified(content: "${this.content} $content", version: nextVersion))
-        return this
+        return this.apply(Events.modified("${this.content} $content", nextVersion))
     }
 
     Document delete() {
-        this.apply(new DocumentDeleted(version: nextVersion))
-        return this
+        return this.apply(Events.deleted(nextVersion))
     }
 
-    void apply(DocumentCreated documentCreated) {
+    Document apply(DocumentCreated documentCreated) {
         super.apply(documentCreated)
         this.title = documentCreated.title
         this.author = documentCreated.author
+        return this
     }
 
-    void apply(ContentModified contentModified) {
+    Document apply(ContentModified contentModified) {
         super.apply(contentModified)
         this.content = contentModified.content
+        return this
     }
 
-    void apply(DocumentDeleted documentDeleted) {
+    Document apply(DocumentDeleted documentDeleted) {
         super.apply(documentDeleted)
+        return this
     }
 }

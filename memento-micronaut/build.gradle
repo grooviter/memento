@@ -14,20 +14,19 @@ dependencies {
     // micronaut
     implementation("io.micronaut.groovy:micronaut-runtime-groovy:2.2.0")
     implementation("javax.annotation:javax.annotation-api")
-    implementation("com.fasterxml.jackson.core:jackson-databind:2.11.2")
-    implementation("com.fasterxml.jackson.core:jackson-annotations:2.11.2")
-    compileOnly('io.micronaut:micronaut-http:2.3.2')
-    compileOnly("io.micronaut:micronaut-inject:2.3.2")
+    implementation("com.fasterxml.jackson.core:jackson-databind:$jackson")
+    implementation("com.fasterxml.jackson.core:jackson-annotations:$jackson")
+    compileOnly("io.micronaut:micronaut-http:$micronaut")
+    compileOnly("io.micronaut:micronaut-inject:$micronaut")
 
     // micronaut-data
-    // TODO REVIEW VERSIONS
-    implementation("io.micronaut.data:micronaut-data-jdbc:2.2.4")
-    implementation("io.micronaut.data:micronaut-data-model:2.2.4")
-    implementation("io.micronaut.data:micronaut-data-processor:2.2.4")
-    implementation("io.micronaut.sql:micronaut-jdbc:2.2.4")
+    implementation("io.micronaut.data:micronaut-data-jdbc:$micronaut_data")
+    implementation("io.micronaut.data:micronaut-data-model:$micronaut_data")
+    implementation("io.micronaut.data:micronaut-data-processor:$micronaut_data")
+    implementation("io.micronaut.sql:micronaut-jdbc:$micronaut_data")
     implementation("io.micronaut.sql:micronaut-jdbc-hikari:3.4.0")
 
     // testing
-    testImplementation 'org.spockframework:spock-core:1.3-groovy-2.5'
-    testImplementation 'junit:junit:4.13'
+    testImplementation("org.spockframework:spock-core:$spockframework")
+    testImplementation("org.spockframework:spock-junit4:$spockframework")
 }

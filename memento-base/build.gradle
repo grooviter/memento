@@ -8,15 +8,14 @@ repositories {
 }
 
 dependencies {
-    implementation("org.codehaus.groovy:groovy:3.0.6")
-    implementation("org.codehaus.groovy:groovy-json:3.0.6")
+    implementation("org.codehaus.groovy:groovy:$groovy")
+    implementation("org.codehaus.groovy:groovy-json:$groovy")
+    implementation("org.slf4j:slf4j-api:$slf4j")
+    implementation("com.fasterxml.jackson.core:jackson-databind:$jackson")
+    implementation("com.fasterxml.jackson.core:jackson-annotations:$jackson")
 
-    implementation("org.slf4j:slf4j-api:1.7.30")
-    implementation("com.fasterxml.jackson.core:jackson-databind:2.11.2")
-    implementation("com.fasterxml.jackson.core:jackson-annotations:2.11.2")
-
-    testImplementation("org.spockframework:spock-core:2.0-M4-groovy-3.0")
-    testImplementation("org.spockframework:spock-junit4:2.0-M4-groovy-3.0")
+    testImplementation("org.spockframework:spock-core:$spockframework")
+    testImplementation("org.spockframework:spock-junit4:$spockframework")
 
 }
 

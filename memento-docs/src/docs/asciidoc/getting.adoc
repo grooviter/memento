@@ -1,0 +1,58 @@
+== Getting started
+
+[source, groovy]
+.save an aggregate
+----
+@Grab('io.grooviter:memento-base:0.1.0')
+import io.grooviter.memento.Memento
+import io.grooviter.memento.model.Aggregate
+import io.grooviter.memento.model.Event
+
+class Document extends Aggregate {
+   String title, author, content
+
+   static Document create(String title, String author) {
+       Document document = new Document()
+       return document.apply(new Created(title: title, author: author, version: nextVersion))
+   }
+
+   Document append(String content) {
+       return this.apply(new Appended(content: "${this.content} $content", version: nextVersion))
+   }
+}
+
+class Created extends Event {
+   String title, author
+}
+
+class Appended extends Event {
+   String content
+}
+
+EventStore eventStore = Memento.builder()
+    .csvEventStorage('/tmp/events.csv', '/tmp/snapshots.csv')
+    .snapshotThreshold(2) // snapshot every 2 events
+    .build()
+
+Document document = Document.create("Memento", "Christopher Nolan")
+    .append("A man who, as a result of an injury,")
+    .append(", has anterograde amnesia")
+    .append("and has short-term memory loss")
+    .append("approximately every fifteen minutes.")
+
+eventStore.save(document)
+----
+
+[source, shell]
+.events.csv
+----
+...-6740974752dc|1|DocumentCreated|{"title":"Memento","aggregateId":"5f5469ba-a031-4ccb...
+...-6740974752dc|2|Appended|{"content":"A man who, as a result of an injury","aggregate...
+...
+----
+
+[source, shell]
+.snapshots
+----
+
+----

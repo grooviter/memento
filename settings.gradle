@@ -1,4 +1,6 @@
 rootProject.name = 'memento'
 
 include('memento-base')
+include('memento-docs')
 include('memento-micronaut')
+include('memento-samples-bookkeeper')

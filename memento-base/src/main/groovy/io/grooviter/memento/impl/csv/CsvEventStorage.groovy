@@ -18,6 +18,17 @@ class CsvEventStorage implements EventStoragePort {
     File eventStorageFile
     File snapshotStorageFile
 
+    static CsvEventStorage create(File events, File snapshots) {
+        if (!events.exists()) {
+            events.createNewFile()
+        }
+        if (!snapshots.exists()) {
+            snapshots.createNewFile()
+        }
+
+        return new CsvEventStorage(events, snapshots)
+    }
+
     @Override
     void append(Event event, SerdePort serdePort) {
         eventStorageFile.append(Mappers.toEventRow(event, serdePort))

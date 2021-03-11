@@ -1,0 +1,35 @@
+plugins {
+    id 'groovy'
+    id("com.github.johnrengelman.shadow") version "6.1.0"
+    id("application")
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation project(':memento-base')
+    implementation("org.codehaus.groovy:groovy:$groovy")
+    implementation("org.codehaus.groovy:groovy-yaml:$groovy")
+
+    implementation "com.google.inject:guice:5.0.1"
+
+    implementation "org.jline:jline:3.18.0"
+    implementation "org.jline:jline-console:3.18.0"
+    implementation 'info.picocli:picocli:4.6.1'
+    implementation("info.picocli:picocli-shell-jline3:4.6.1")
+    implementation "org.fusesource.jansi:jansi:2.1.0"
+
+    implementation 'com.google.guava:guava:29.0-jre'
+    implementation 'de.vandermeer:asciitable:0.3.2'
+
+}
+
+application {
+    mainClassName "io.grooviter.memento.bookkeeper.Application"
+}
+
+test {
+    useJUnitPlatform()
+}

@@ -18,4 +18,15 @@ class StorageCheck {
         assert eventStore.listEvents(document.id).any { it instanceof DocumentDeleted }
         assert eventStore.listEvents(document.id).any { it instanceof ContentModified }
     }
+
+    static void checkAggregateIntegrity(EventStore eventStore) {
+        Document document = Fixtures.fullLifeCycleDocument()
+        eventStore.save(document)
+        Document retrieved = eventStore.load(document.id, Document).get()
+
+        assert retrieved.id
+        assert retrieved.title
+        assert retrieved.author
+        assert retrieved.content
+    }
 }

@@ -57,13 +57,13 @@ class MementoBuilder {
     }
 
     MementoBuilder csvStorage(File events, File snapshots) {
-        CsvEventStorage csvEventStorage = new CsvEventStorage(events, snapshots)
+        CsvEventStorage csvEventStorage = CsvEventStorage.create(events, snapshots)
         this.configBuilder = this.configBuilder.eventStorage(csvEventStorage)
         return this
     }
 
     MementoBuilder csvStorage(String eventsPath, String snapshotsPath) {
-        CsvEventStorage csvEventStorage = new CsvEventStorage(new File(eventsPath), new File(snapshotsPath))
+        CsvEventStorage csvEventStorage = CsvEventStorage.create(new File(eventsPath), new File(snapshotsPath))
         this.configBuilder = this.configBuilder.eventStorage(csvEventStorage)
         return this
     }

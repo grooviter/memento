@@ -1,0 +1,3 @@
+threshold: 10
+events: /tmp/book-keeper/events.csv
+snapshots: /tmp/book-keeper/snapshots.csv+

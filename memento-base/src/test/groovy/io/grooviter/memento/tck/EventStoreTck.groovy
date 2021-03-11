@@ -7,5 +7,6 @@ class EventStoreTck {
 
     static void check(EventStore eventStore) {
         StorageCheck.checkList(eventStore)
+        StorageCheck.checkAggregateIntegrity(eventStore)
     }
 }

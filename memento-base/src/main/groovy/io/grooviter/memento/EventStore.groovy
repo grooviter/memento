@@ -34,6 +34,14 @@ interface EventStore {
      */
     Stream<Event> listEvents(UUID aggregateId, Integer version)
 
+    // listEvents(OffsetDateTime from, OffsetDateTime to)
+    // listEvents(Duration duration) // between offset date times
+    // list all account creations
+    // listEvents(Class<? extends Event>) // by type
+    // list all bank transactions of the last month
+    // listEvents(Class<? extends Event>, OffsetDateTime from, OffsetDateTime to)
+    // listEvents(Class<? extends Event>, Duration duration) // by type between local date times
+
     /**
      * Lists all events from a given aggregate from the beginning of the stream
      *
