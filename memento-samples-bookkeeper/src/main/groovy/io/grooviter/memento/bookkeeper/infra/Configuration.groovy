@@ -8,6 +8,7 @@ class Configuration {
 
     Snapshots snapshots = new Snapshots()
     Csv csv = new Csv()
+    Projections projections = new Projections()
 
     @ConfigurationProperties('snapshots')
     static class Snapshots {
@@ -18,6 +19,11 @@ class Configuration {
     static class Csv {
         File events
         File snapshots
+    }
+
+    @ConfigurationProperties('projections')
+    static class Projections {
+        File accounts
     }
 }
 

@@ -8,3 +8,5 @@ bookkeeper:
   csv:
     events: /tmp/events.csv
     snapshots: /tmp/snapshots.csv
+  projections:
+    accounts: /tmp/projections/accounts.csv
