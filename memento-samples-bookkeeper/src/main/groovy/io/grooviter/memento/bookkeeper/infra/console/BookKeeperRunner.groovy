@@ -1,8 +1,6 @@
 package io.grooviter.memento.bookkeeper.infra.console
 
-import com.google.inject.Guice
-import com.google.inject.Injector
-import io.grooviter.memento.bookkeeper.account.adapter.AccountModule
+import io.micronaut.configuration.picocli.MicronautFactory
 import org.fusesource.jansi.AnsiConsole
 import org.jline.console.SystemRegistry
 import org.jline.console.impl.SystemRegistryImpl
@@ -13,10 +11,8 @@ import org.jline.reader.MaskingCallback
 import org.jline.reader.Parser
 import org.jline.reader.UserInterruptException
 import org.jline.reader.impl.DefaultParser
-import org.jline.terminal.Size
 import org.jline.terminal.Terminal
 import org.jline.terminal.TerminalBuilder
-import org.jline.utils.Display
 import picocli.CommandLine
 import picocli.shell.jline3.PicocliCommands
 
@@ -26,11 +22,11 @@ import java.util.function.Supplier
 
 class BookKeeperRunner {
 
-    BookKeeperCliFactory factory
+    MicronautFactory factory
 
-    static BookKeeperRunner create(Injector injector) {
+    static BookKeeperRunner create(String... args) {
         return new BookKeeperRunner(
-            factory: new BookKeeperCliFactory(injector)
+            factory: MicronautFactoryInitializer.initialize(AllCommands, args)
         )
     }
 
@@ -57,7 +53,6 @@ class BookKeeperRunner {
                     .build()
 
                 cmd.colorScheme.ansi().println(cmd.colorScheme.ansi().string(Constants.BANNER))
-                factory.setTerminal(terminal)
 
                 // start the shell and process input until the user quits with Ctrl-D
                 String line
@@ -80,6 +75,5 @@ class BookKeeperRunner {
         } finally {
             AnsiConsole.systemUninstall()
         }
-
     }
 }

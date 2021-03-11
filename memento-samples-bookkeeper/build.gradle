@@ -1,33 +1,53 @@
 plugins {
     id 'groovy'
     id("com.github.johnrengelman.shadow") version "6.1.0"
-    id("application")
+    id("io.micronaut.application") version "1.4.2"
 }
+
+version = "0.1"
+group = "io.grooviter.memento.bookkeeper"
 
 repositories {
     mavenCentral()
 }
 
+micronaut {
+    testRuntime("spock2")
+    processing {
+        incremental(true)
+        annotations("io.grooviter.memento.bookkeeper.*")
+    }
+}
+
 dependencies {
+    // Memento
     implementation project(':memento-base')
     implementation("org.codehaus.groovy:groovy:$groovy")
     implementation("org.codehaus.groovy:groovy-yaml:$groovy")
 
-    implementation "com.google.inject:guice:5.0.1"
+    // Micronaut
+    implementation("info.picocli:picocli")
+    implementation("io.micronaut.picocli:micronaut-picocli")
+    compileOnly("info.picocli:picocli-codegen")
+    implementation("io.micronaut:micronaut-validation")
+    implementation("io.micronaut.groovy:micronaut-runtime-groovy")
+    implementation("javax.annotation:javax.annotation-api")
+    runtimeOnly("ch.qos.logback:logback-classic")
+    testImplementation("io.micronaut:micronaut-http-client")
 
+    // Console
     implementation "org.jline:jline:3.18.0"
     implementation "org.jline:jline-console:3.18.0"
     implementation 'info.picocli:picocli:4.6.1'
     implementation("info.picocli:picocli-shell-jline3:4.6.1")
     implementation "org.fusesource.jansi:jansi:2.1.0"
 
-    implementation 'com.google.guava:guava:29.0-jre'
+    // ascii tables
     implementation 'de.vandermeer:asciitable:0.3.2'
-
 }
 
 application {
-    mainClassName "io.grooviter.memento.bookkeeper.Application"
+    mainClass.set("io.grooviter.memento.bookkeeper.Application")
 }
 
 test {

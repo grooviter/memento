@@ -1,25 +1,15 @@
 package io.grooviter.memento.bookkeeper.account.adapter.persistence
 
-import com.google.inject.AbstractModule
-import com.google.inject.Provides
-import io.grooviter.memento.EventStore
-import io.grooviter.memento.bookkeeper.account.application.port.out.AccountPorts
 import io.grooviter.memento.bookkeeper.account.domain.Account
 import io.grooviter.memento.bookkeeper.account.domain.events.*
 import io.grooviter.memento.model.Mappings
+import io.micronaut.context.annotation.Factory
 
-class PersistenceModule extends AbstractModule {
-    void configure() {
-        bind(AccountPorts.SaveAccountPort).to(PersistenceAdapter)
-        bind(AccountPorts.LoadAccountPort).to(PersistenceAdapter)
-    }
+import javax.inject.Singleton
 
-    @Provides
-    PersistenceAdapter getPersistenceAdapter(EventStore eventStore) {
-        return new PersistenceAdapter(eventStore)
-    }
-
-    @Provides
+@Factory
+class MappingsFactory {
+    @Singleton
     Mappings providesMappings() {
         return Mappings.builder()
             .addMapping("ACCOUNT", Account)

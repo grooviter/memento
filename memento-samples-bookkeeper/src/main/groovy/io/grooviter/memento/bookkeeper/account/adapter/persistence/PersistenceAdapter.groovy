@@ -4,6 +4,9 @@ import io.grooviter.memento.EventStore
 import io.grooviter.memento.bookkeeper.account.application.port.out.AccountPorts
 import io.grooviter.memento.bookkeeper.account.domain.Account
 
+import javax.inject.Singleton
+
+@Singleton
 class PersistenceAdapter implements
     AccountPorts.SaveAccountPort,
     AccountPorts.LoadAccountPort {

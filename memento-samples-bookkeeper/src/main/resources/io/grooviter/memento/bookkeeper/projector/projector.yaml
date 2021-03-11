@@ -1,6 +1,0 @@
-creations: /tmp/book-keeper/projections/account/creations.csv
-deletions: /tmp/book-keeper/projections/account/deletions.csv
-deposits: /tmp/book-keeper/projections/account/deposits.csv
-withdrawals: /tmp/book-keeper/projections/account/withdrawals.csv
-commissions: /tmp/book-keeper/projections/account/commissions.csv
-

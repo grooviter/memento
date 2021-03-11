@@ -1,0 +1,6 @@
+applicationType: cli
+defaultPackage: io.grooviter.memento.bookkeeper
+testFramework: spock
+sourceLanguage: groovy
+buildTool: gradle
+features: [annotation-api, app-name, gradle, groovy, logback, picocli, picocli-groovy-application, picocli-spock, readme, shade, spock, yaml]

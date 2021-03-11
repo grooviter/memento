@@ -4,10 +4,16 @@ import io.grooviter.memento.bookkeeper.account.application.port.in.UseCases
 import io.grooviter.memento.bookkeeper.account.application.port.out.AccountPorts
 import io.grooviter.memento.bookkeeper.account.domain.Account
 
+import javax.inject.Inject
+import javax.inject.Singleton
+
+@Singleton
 class CloseAccountService implements UseCases.CloseAccountCommand {
 
+    @Inject
     AccountPorts.LoadAccountPort loadAccountPort
 
+    @Inject
     AccountPorts.SaveAccountPort saveAccountPort
 
     @Override

@@ -1,10 +1,9 @@
 package io.grooviter.memento.bookkeeper.infra.console
 
 import io.grooviter.memento.bookkeeper.account.adapter.console.commands.CloseCommand
-import io.grooviter.memento.bookkeeper.account.adapter.console.commands.DepositCommand
 import io.grooviter.memento.bookkeeper.account.adapter.console.commands.CreateCommand
+import io.grooviter.memento.bookkeeper.account.adapter.console.commands.DepositCommand
 import io.grooviter.memento.bookkeeper.account.adapter.console.commands.WithdrawCommand
-import io.grooviter.memento.bookkeeper.userarea.adapter.console.ListAccountsCommand
 import picocli.CommandLine
 import picocli.CommandLine.Command
 
@@ -12,8 +11,7 @@ import picocli.CommandLine.Command
     CreateCommand,
     DepositCommand,
     WithdrawCommand,
-    CloseCommand,
-    //ListAccountsCommand
+    CloseCommand
 ])
 class AllCommands implements Runnable {
 

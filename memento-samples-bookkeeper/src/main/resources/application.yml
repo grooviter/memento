@@ -1,0 +1,10 @@
+micronaut:
+  application:
+    name: bookkeeper
+
+bookkeeper:
+  snapshots:
+    threshold: 4
+  csv:
+    events: /tmp/events.csv
+    snapshots: /tmp/snapshots.csv
