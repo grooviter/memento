@@ -3,7 +3,7 @@ package io.grooviter.memento.bookkeeper.account.domain.events
 import groovy.transform.builder.Builder
 import io.grooviter.memento.model.Event
 
-@Builder(includeSuperProperties = true, excludes = ['id'])
+@Builder(includeSuperProperties = true, excludes = ['id', 'createdAt'])
 class CommissionApplied extends Event {
     BigDecimal amount
     BigDecimal balance

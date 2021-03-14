@@ -26,7 +26,7 @@ class MemoryEventStoreSpec extends Specification {
     void 'check tck compliance with mappings'() {
         when: 'creating event store with those mappings'
         EventStore eventStore = Memento.builder()
-                .groovySerde(Fixtures.documentMappings())
+                .jacksonSerde(Fixtures.documentMappings())
                 .memoryStorage()
                 .snapshotThreshold(2)
                 .build()

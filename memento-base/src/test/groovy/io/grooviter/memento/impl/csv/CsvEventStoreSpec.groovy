@@ -32,7 +32,7 @@ class CsvEventStoreSpec extends Specification {
 
         when: 'creating event store with those mappings'
         EventStore eventStore = Memento.builder()
-            .groovySerde(Fixtures.documentMappings())
+            .jacksonSerde(Fixtures.documentMappings())
             .csvStorage(events, snapshots)
             .snapshotThreshold(2)
             .build()
@@ -57,7 +57,7 @@ class CsvEventStoreSpec extends Specification {
 
         and: 'an event store'
         EventStore eventStore = Memento.build {
-            groovySerde()
+            jacksonSerde()
             csvStorage(eventsPath, snapshotsPath)
             snapshotThreshold(2)
         }

@@ -6,5 +6,5 @@ class Event {
     UUID id = UUID.randomUUID()
     UUID aggregateId
     Integer version
-    OffsetDateTime createdAt
+    OffsetDateTime createdAt = OffsetDateTime.now()
 }

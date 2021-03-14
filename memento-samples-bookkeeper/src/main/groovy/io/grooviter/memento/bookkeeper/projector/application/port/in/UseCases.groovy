@@ -13,7 +13,16 @@ final class UseCases {
             String holderName
             OffsetDateTime createdAt
         }
+        void store(Params params)
+    }
 
+    interface UpdateAccountBalance {
+        @Builder
+        class Params {
+            UUID id
+            BigDecimal newBalance
+            OffsetDateTime createdAt
+        }
         void store(Params params)
     }
 }

@@ -1,4 +1,4 @@
-package io.grooviter.memento.bookkeeper.projector.domain
+package io.grooviter.memento.bookkeeper.report.domain
 
 import com.opencsv.bean.CsvBindByPosition
 import com.opencsv.bean.CsvDate

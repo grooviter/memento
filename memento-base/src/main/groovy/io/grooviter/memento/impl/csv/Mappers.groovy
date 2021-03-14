@@ -31,7 +31,7 @@ class Mappers {
             aggregateType: serdePort.resolveAlias(aggregate.getClass()),
             version: aggregate.version,
             json: serdePort.aggregateToJSON(aggregate),
-            createdAt: OffsetDateTime.now()
+            createdAt: serdePort.objectToJSON(OffsetDateTime.now())
         ]
 
         rowMap.values()*.toString().join(SEPARATOR_JOIN) + NEWLINE
@@ -44,7 +44,7 @@ class Mappers {
             version: event.version,
             type: serdePort.resolveAlias(event.getClass()),
             json: serdePort.eventToJSON(event),
-            createdAt: event.createdAt
+            createdAt: serdePort.objectToJSON(event.createdAt)
         ]
 
         rowMap.values()*.toString().join(SEPARATOR_JOIN) + NEWLINE

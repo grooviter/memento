@@ -24,6 +24,7 @@ class Configuration {
     @ConfigurationProperties('projections')
     static class Projections {
         File accounts
+        File balances
     }
 }
 

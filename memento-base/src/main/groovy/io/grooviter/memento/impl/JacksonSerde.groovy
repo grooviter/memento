@@ -1,4 +1,4 @@
-package io.grooviter.memento.mn
+package io.grooviter.memento.impl
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import groovy.util.logging.Slf4j
@@ -7,20 +7,20 @@ import io.grooviter.memento.model.Aggregate
 import io.grooviter.memento.model.Event
 import io.grooviter.memento.model.Mappings
 
-import javax.inject.Inject
-import javax.inject.Singleton
-
 @Slf4j
-@Singleton
-class MicroSerde implements SerdePort {
+class JacksonSerde implements SerdePort {
 
     private final Mappings mappings
     private final ObjectMapper mapper
 
-    @Inject
-    MicroSerde(List<Mappings> mappings, ObjectMapper objectMapper) {
+    JacksonSerde(List<Mappings> mappings, ObjectMapper objectMapper) {
         this.mappings = new Mappings(mappings.collectMany { it.mappingList })
         this.mapper = objectMapper
+    }
+
+    JacksonSerde() {
+        this.mappings = Mappings.builder().build()
+        this.mapper = new ObjectMapper()
     }
 
     @Override
@@ -31,6 +31,11 @@ class MicroSerde implements SerdePort {
     @Override
     String eventToJSON(Event event) {
         return this.mapper.writeValueAsString(event)
+    }
+
+    @Override
+    String objectToJSON(Object o) {
+        return this.mapper.writeValueAsString(o)
     }
 
     @Override

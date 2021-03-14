@@ -4,6 +4,9 @@ import io.grooviter.memento.bookkeeper.account.adapter.console.commands.CloseCom
 import io.grooviter.memento.bookkeeper.account.adapter.console.commands.CreateCommand
 import io.grooviter.memento.bookkeeper.account.adapter.console.commands.DepositCommand
 import io.grooviter.memento.bookkeeper.account.adapter.console.commands.WithdrawCommand
+import io.grooviter.memento.bookkeeper.report.adapter.console.AccountListCommand
+import io.grooviter.memento.bookkeeper.report.adapter.console.ShowBalanceCommand
+import io.grooviter.memento.bookkeeper.report.adapter.console.ShowBalanceHistoryCommand
 import picocli.CommandLine
 import picocli.CommandLine.Command
 
@@ -11,7 +14,10 @@ import picocli.CommandLine.Command
     CreateCommand,
     DepositCommand,
     WithdrawCommand,
-    CloseCommand
+    CloseCommand,
+    AccountListCommand,
+    ShowBalanceCommand,
+    ShowBalanceHistoryCommand
 ])
 class AllCommands implements Runnable {
 
@@ -27,7 +33,7 @@ class AllCommands implements Runnable {
         out.println(toAnsi(text))
     }
 
-    private String toAnsi(String text) {
+    String toAnsi(String text) {
         return spec.commandLine().getColorScheme().ansi().string(text)
     }
 }

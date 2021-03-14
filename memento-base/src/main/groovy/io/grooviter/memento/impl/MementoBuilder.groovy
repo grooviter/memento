@@ -1,5 +1,6 @@
 package io.grooviter.memento.impl
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import io.grooviter.memento.EventBusPort
 import io.grooviter.memento.EventStoragePort
 import io.grooviter.memento.EventStore
@@ -41,13 +42,18 @@ class MementoBuilder {
         return this
     }
 
-    MementoBuilder groovySerde() {
-        this.configBuilder = this.configBuilder.serde(new GroovySerde())
+    MementoBuilder jacksonSerde() {
+        this.configBuilder = this.configBuilder.serde(new JacksonSerde([], new ObjectMapper()))
         return this
     }
 
-    MementoBuilder groovySerde(Mappings mappings) {
-        this.configBuilder = this.configBuilder.serde(new GroovySerde(mappings))
+    MementoBuilder jacksonSerde(Mappings mappings) {
+        this.configBuilder = this.configBuilder.serde(new JacksonSerde([mappings], new ObjectMapper()))
+        return this
+    }
+
+    MementoBuilder jacksonSerde(Mappings mappings, ObjectMapper objectMapper) {
+        this.configBuilder = this.configBuilder.serde(new JacksonSerde([mappings], objectMapper))
         return this
     }
 

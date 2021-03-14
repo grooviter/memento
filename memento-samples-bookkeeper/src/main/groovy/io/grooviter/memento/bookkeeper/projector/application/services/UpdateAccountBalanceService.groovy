@@ -1,28 +1,25 @@
 package io.grooviter.memento.bookkeeper.projector.application.services
 
-import groovy.util.logging.Slf4j
 import io.grooviter.memento.bookkeeper.projector.application.port.in.UseCases
 import io.grooviter.memento.bookkeeper.projector.application.port.out.ProjectorPorts
-import io.grooviter.memento.bookkeeper.projector.domain.Account
+import io.grooviter.memento.bookkeeper.projector.domain.Balance
 
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@Slf4j
 @Singleton
-class StoreNewAccountService implements UseCases.StoreNewAccount {
-
+class UpdateAccountBalanceService implements UseCases.UpdateAccountBalance {
     @Inject
-    ProjectorPorts.SaveAccountPort saveAccountPort
+    ProjectorPorts.UpdateBalancePort updateBalancePort
 
     @Override
     void store(Params params) {
-        Account newAccount = Account.builder()
-            .id(params.id?.toString())
-            .name(params.holderName)
+        Balance balance = Balance.builder()
+            .accountId(params.id)
+            .currentBalance(params.newBalance)
             .createdAt(params.createdAt)
             .build()
 
-        saveAccountPort.save(newAccount)
+        updateBalancePort.updateBalance(balance)
     }
 }

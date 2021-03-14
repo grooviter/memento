@@ -1,6 +1,5 @@
 package io.grooviter.memento.bookkeeper
 
-
 import io.grooviter.memento.bookkeeper.infra.console.BookKeeperRunner
 
 class Application {

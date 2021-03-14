@@ -7,6 +7,7 @@ interface SerdePort {
 
     String aggregateToJSON(Aggregate aggregate)
     String eventToJSON(Event event)
+    String objectToJSON(Object o)
 
     Aggregate aggregateFromJSON(String alias, String json)
     Event eventFromJSON(String alias, String json)

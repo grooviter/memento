@@ -1,18 +1,16 @@
-package io.grooviter.memento.bookkeeper.projector.domain
+package io.grooviter.memento.bookkeeper.report.domain
 
 import com.opencsv.bean.CsvBindByPosition
 import com.opencsv.bean.CsvDate
-import groovy.transform.builder.Builder
 
 import java.time.OffsetDateTime
 
-@Builder
-class Account {
+class Balance {
     @CsvBindByPosition(position = 0)
-    String id
+    String accountId
 
     @CsvBindByPosition(position = 1)
-    String name
+    BigDecimal balance
 
     @CsvDate("yyyy-MM-dd'T'HH:mm:ssZ")
     @CsvBindByPosition(position = 2)
