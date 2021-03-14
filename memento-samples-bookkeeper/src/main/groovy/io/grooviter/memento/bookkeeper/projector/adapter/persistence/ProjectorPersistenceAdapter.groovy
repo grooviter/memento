@@ -19,11 +19,11 @@ class ProjectorPersistenceAdapter implements
 
     @Override
     void save(Account account) {
-        Utils.writeToCsvFile(configuration.projections.accounts, account)
+        Utils.appendToCsvFile(configuration.projections.accounts, account)
     }
 
     @Override
     void updateBalance(Balance balance) {
-        Utils.writeToCsvFile(configuration.projections.balances, balance)
+        Utils.appendToCsvFile(configuration.projections.balances, balance)
     }
 }

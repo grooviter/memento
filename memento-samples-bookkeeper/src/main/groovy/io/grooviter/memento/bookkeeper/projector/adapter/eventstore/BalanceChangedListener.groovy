@@ -19,11 +19,11 @@ class BalanceChangedListener {
     ObjectMapper objectMapper
 
     @Inject
-    UseCases.UpdateAccountBalance storeNewDeposit
+    UseCases.UpdateAccountBalance updateAccountBalance
 
     @EventListener
-    void onDepositMade(TopicAwareEvent event) {
-        resolveEventBean(event).ifPresent(storeNewDeposit::store)
+    void onBalanceChanged(TopicAwareEvent event) {
+        resolveEventBean(event).ifPresent(updateAccountBalance::store)
     }
 
     Optional<UseCases.UpdateAccountBalance.Params> resolveEventBean(TopicAwareEvent event) {

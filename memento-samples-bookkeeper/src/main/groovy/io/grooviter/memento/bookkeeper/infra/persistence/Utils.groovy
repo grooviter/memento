@@ -21,7 +21,7 @@ class Utils {
             .orElse(Stream<T>.empty())
     }
 
-    static <T> void writeToCsvFile(File fileToAppend, T object) {
+    static <T> void appendToCsvFile(File fileToAppend, T object) {
         if (!fileToAppend.exists()) {
             Files.createDirectories(fileToAppend.parentFile.toPath())
             Files.createFile(fileToAppend.toPath())
