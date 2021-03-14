@@ -13,10 +13,10 @@ dependencies {
     implementation("org.slf4j:slf4j-api:$slf4j")
     implementation("com.fasterxml.jackson.core:jackson-databind:$jackson")
     implementation("com.fasterxml.jackson.core:jackson-annotations:$jackson")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jackson")
 
     testImplementation("org.spockframework:spock-core:$spockframework")
     testImplementation("org.spockframework:spock-junit4:$spockframework")
-
 }
 
 test {

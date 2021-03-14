@@ -1,6 +1,8 @@
 package io.grooviter.memento.impl
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import groovy.util.logging.Slf4j
 import io.grooviter.memento.SerdePort
 import io.grooviter.memento.model.Aggregate
@@ -14,13 +16,26 @@ class JacksonSerde implements SerdePort {
     private final ObjectMapper mapper
 
     JacksonSerde(List<Mappings> mappings, ObjectMapper objectMapper) {
-        this.mappings = new Mappings(mappings.collectMany { it.mappingList })
-        this.mapper = objectMapper
+        this.mappings = Optional
+            .ofNullable(mappings)
+            .map(mappings1 -> mappings1.collectMany { it.mappingList })
+            .map(Mappings::new)
+            .orElse(Mappings.builder().build())
+
+        this.mapper = Optional
+            .ofNullable(objectMapper)
+            .orElse(defaultObjectMapper())
     }
 
     JacksonSerde() {
         this.mappings = Mappings.builder().build()
-        this.mapper = new ObjectMapper()
+        this.mapper = defaultObjectMapper()
+    }
+
+    private static ObjectMapper defaultObjectMapper() {
+        return new ObjectMapper()
+                .registerModule(new JavaTimeModule())
+                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
     }
 
     @Override

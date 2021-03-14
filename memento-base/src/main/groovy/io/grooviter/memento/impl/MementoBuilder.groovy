@@ -43,12 +43,12 @@ class MementoBuilder {
     }
 
     MementoBuilder jacksonSerde() {
-        this.configBuilder = this.configBuilder.serde(new JacksonSerde([], new ObjectMapper()))
+        this.configBuilder = this.configBuilder.serde(new JacksonSerde())
         return this
     }
 
     MementoBuilder jacksonSerde(Mappings mappings) {
-        this.configBuilder = this.configBuilder.serde(new JacksonSerde([mappings], new ObjectMapper()))
+        this.configBuilder = this.configBuilder.serde(new JacksonSerde([mappings], null))
         return this
     }
 

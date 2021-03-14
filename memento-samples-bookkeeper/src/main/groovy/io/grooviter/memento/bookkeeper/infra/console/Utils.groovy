@@ -60,21 +60,4 @@ class Utils {
     static <T> TableBuilder<T> tableBuilder(Class<T> type) {
         return new TableBuilder<T>(type)
     }
-
-    static <A> String renderTable(List<A> rows, String[] columnNames, Function<A, ?>... producers) {
-        AsciiTable asciiTable = new AsciiTable()
-        asciiTable.addRule()
-        asciiTable.addRow(columnNames).setTextAlignment(TextAlignment.CENTER)
-        rows
-            .stream()
-            .forEach(account -> {
-                asciiTable.addRule()
-                List<String> rowValues = Stream.of(producers)
-                    .map(p -> p.apply(account).toString())
-                    .collect(Collectors.toList())
-                asciiTable.addRow(rowValues)
-            })
-        asciiTable.addRule()
-        return asciiTable.render(120)
-    }
 }
