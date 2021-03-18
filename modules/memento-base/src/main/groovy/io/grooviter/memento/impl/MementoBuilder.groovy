@@ -1,6 +1,7 @@
 package io.grooviter.memento.impl
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.ser.std.StdKeySerializers
 import io.grooviter.memento.EventBusPort
 import io.grooviter.memento.EventStoragePort
 import io.grooviter.memento.EventStore
@@ -14,7 +15,6 @@ import java.util.function.Consumer
 class MementoBuilder {
 
     private EventStoreConfig.EventStoreConfigBuilder configBuilder
-    private Consumer<Event> onEventHandler
 
     MementoBuilder() {
         this.configBuilder = new EventStoreConfig.EventStoreConfigBuilder()
@@ -56,15 +56,17 @@ class MementoBuilder {
     }
 
     MementoBuilder onEvent(Consumer<Event> consumer) {
-        this.onEventHandler = consumer
+        this.eventBus(DefaultEventBus.create(consumer))
         return this
     }
 
     EventStore build() {
-        if (this.onEventHandler) {
-            this.configBuilder.eventBus(DefaultEventBus.create(this.onEventHandler))
-        }
+        EventStoreConfig config = this.configBuilder.build()
 
-        return new EventStoreImpl(this.configBuilder.build())
+        assert config.eventStorage, "event-storage should be provided"
+        assert config.serde, "event serialization mechanism should be provided"
+        assert config.eventBus, "event bus mechanism should be provided"
+
+        return new EventStoreImpl(config)
     }
 }

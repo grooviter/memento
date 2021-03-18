@@ -7,4 +7,8 @@ class MementoCsvExtension {
     static MementoBuilder csvStorage(MementoBuilder builder, File eventsFile, File snapshotsFile) {
         return builder.eventStorage(new CsvEventStorage(eventsFile, snapshotsFile))
     }
+
+    static MementoBuilder csvStorage(MementoBuilder builder, String eventsFilePath, String snapshotsFilePath) {
+        return builder.eventStorage(new CsvEventStorage(new File(eventsFilePath), new File (snapshotsFilePath)))
+    }
 }

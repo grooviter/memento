@@ -30,3 +30,7 @@ dependencies {
     testImplementation("org.spockframework:spock-core:$spockframework")
     testImplementation("org.spockframework:spock-junit4:$spockframework")
 }
+
+test {
+    useJUnitPlatform()
+}

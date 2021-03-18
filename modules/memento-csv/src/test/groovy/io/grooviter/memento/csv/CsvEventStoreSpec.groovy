@@ -3,6 +3,7 @@ package io.grooviter.memento.csv
 import io.grooviter.memento.EventStore
 import io.grooviter.memento.Memento
 import io.grooviter.memento.tck.EventStoreTck
+import io.grooviter.memento.tck.Utils
 import io.grooviter.memento.tck.fixtures.Fixtures
 import spock.lang.Specification
 
@@ -19,22 +20,25 @@ class CsvEventStoreSpec extends Specification {
 
         where: 'possible forms of setting the memory storage are'
         eventStore << [
-                Memento.builder().eventStorage(new CsvEventStorage(tempEventsFile(), tempSnapshotsFile())).build(),
-                Memento.build { csvStorage(io.grooviter.memento.tck.Utils.tempEventsFile(), io.grooviter.memento.tck.Utils.tempSnapshotsFile()) },
-                Memento.build { eventStorage(new CsvEventStorage(io.grooviter.memento.tck.Utils.tempEventsFile(), io.grooviter.memento.tck.Utils.tempSnapshotsFile())) }
+            Memento.builder()
+                .eventStorage(new CsvEventStorage(tempEventsFile(), tempSnapshotsFile()))
+                .jacksonSerde()
+                .onEvent(event -> println "new event $event")
+                .build()
         ]
     }
 
     void 'check tck compliance with mappings'() {
         given: 'destination files'
-        File events = io.grooviter.memento.tck.Utils.tempEventsFile()
-        File snapshots = io.grooviter.memento.tck.Utils.tempSnapshotsFile()
+        File events = Utils.tempEventsFile()
+        File snapshots = Utils.tempSnapshotsFile()
 
         when: 'creating event store with those mappings'
         EventStore eventStore = Memento.builder()
             .jacksonSerde(Fixtures.documentMappings())
             .csvStorage(events, snapshots)
             .snapshotThreshold(2)
+            .onEvent(event -> "on event $event")
             .build()
 
         and: 'all tck checks should be passed'
@@ -56,11 +60,12 @@ class CsvEventStoreSpec extends Specification {
         String snapshotsPath = "/tmp/snapshots-${now}.csv"
 
         and: 'an event store'
-        EventStore eventStore = Memento.build {
-            jacksonSerde()
-            csvStorage(eventsPath, snapshotsPath)
-            snapshotThreshold(2)
-        }
+        EventStore eventStore = Memento.builder()
+            .jacksonSerde()
+            .csvStorage(eventsPath, snapshotsPath)
+            .onEvent(event -> println "event")
+            .snapshotThreshold(2)
+            .build()
 
         when: 'applying operations'
         EventStoreTck.check(eventStore)
