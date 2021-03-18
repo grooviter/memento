@@ -1,6 +1,15 @@
 rootProject.name = 'memento'
 
-include('memento-base')
-include('memento-docs')
-include('memento-micronaut')
-include('memento-samples-bookkeeper')
+buildscript {
+    repositories {
+        gradlePluginPortal()
+    }
+    dependencies {
+        classpath 'org.kordamp.gradle:settings-gradle-plugin:0.44.0'
+    }
+}
+apply plugin: 'org.kordamp.gradle.settings'
+
+projects {
+    directories = ['docs', 'modules', 'samples']
+}

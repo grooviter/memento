@@ -1,0 +1,22 @@
+apply plugin: 'org.kordamp.gradle.guide'
+
+repositories {
+    mavenCentral()
+}
+
+asciidoctor {
+    baseDirFollowsSourceDir()
+    attributes(
+        'memento': memento,
+        'toc': 'left',
+        'source-highlighter': 'coderay'
+    )
+
+    resources {
+        from('src/docs/images') {
+            include '**/*'
+        }
+
+        into './images'
+    }
+}

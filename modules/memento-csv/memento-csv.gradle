@@ -1,0 +1,14 @@
+plugins {
+    id 'groovy'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile project(':memento-base')
+    testImplementation project(':memento-api-tck')
+    testImplementation("org.spockframework:spock-core:$spockframework")
+    testImplementation("org.spockframework:spock-junit4:$spockframework")
+}

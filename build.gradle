@@ -1,0 +1,65 @@
+plugins {
+    id 'org.kordamp.gradle.groovy-project' version '0.44.0'   
+    id 'org.kordamp.gradle.jacoco' version '0.44.0'
+    id 'org.kordamp.gradle.codenarc' version '0.44.0'
+}
+
+config {
+    release = (rootProject.findProperty('release') ?: false).toBoolean()  
+
+    info {                                                                
+        name        = 'Memento'
+        vendor      = 'Grooviter'
+        description = 'Poor man\'s event-store abstraction'
+
+        links {
+            website      = 'https://github.com/grooviter/memento'
+            issueTracker = 'https://github.com/grooviter/memento/issues'
+            scm          = 'https://github.com/grooviter/memento.git'
+        }
+
+        people {
+            person {
+                id    = 'marioggar'
+                name  = 'Mario Garcia'
+                roles = ['developer']
+            }
+        }
+    }
+
+    licensing {
+        includes = ['**/*.groovy', '**/*.gradle']
+        licenses {
+            license {
+                id = 'Apache-2.0'
+            }
+        }
+    }
+
+    coverage {
+        jacoco {
+            toolVersion = '0.8.6'
+        }
+    }
+    quality {
+        codenarc {
+            toolVersion    = '2.0.0'
+            ignoreFailures = true
+            aggregate {
+                excludedProjects ['bookkeeper']
+            }
+        }
+    }
+}
+
+allprojects {
+    repositories {
+        mavenCentral()
+    }
+
+    configurations.codenarc {
+        resolutionStrategy {
+            force "org.codehaus.groovy:groovy:$groovy"
+        }
+    }
+}

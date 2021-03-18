@@ -1,0 +1,21 @@
+plugins {
+    id 'groovy'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile project(':memento-api')
+    implementation("com.fasterxml.jackson.core:jackson-databind:$jackson")
+    implementation("com.fasterxml.jackson.core:jackson-annotations:$jackson")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jackson")
+
+    testImplementation project(':memento-api-tck')
+    testImplementation("org.spockframework:spock-core:$spockframework")
+    testImplementation("org.spockframework:spock-junit4:$spockframework")
+}
+test {
+    useJUnitPlatform()
+}
