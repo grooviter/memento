@@ -9,11 +9,13 @@ import io.grooviter.memento.model.Aggregate
 import io.grooviter.memento.model.Event
 
 import javax.inject.Inject
+import javax.inject.Singleton
 import java.util.stream.Stream
 
 /**
  * @since 0.1.0
  */
+@Singleton
 class MicroStorage implements EventStoragePort {
 
     /**

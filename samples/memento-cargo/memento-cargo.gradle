@@ -1,0 +1,62 @@
+plugins {
+    id("groovy")
+    id("com.github.johnrengelman.shadow") version "6.1.0"
+    id("io.micronaut.application") version "1.4.2"
+}
+
+version = "0.1"
+group = "io.grooviter.memento.cargo"
+
+repositories {
+    mavenCentral()
+}
+
+micronaut {
+    runtime("netty")
+    testRuntime("spock2")
+    processing {
+        incremental(true)
+        annotations("io.grooviter.memento.cargo.*")
+    }
+}
+
+dependencies {
+    // memento
+    implementation project(':memento-micronaut-jdbc')
+
+    // micronaut
+    compileOnly("io.micronaut.data:micronaut-data-processor")
+    compileOnly("io.micronaut.openapi:micronaut-openapi")
+    implementation("io.micronaut:micronaut-validation")
+    implementation("io.micronaut.groovy:micronaut-runtime-groovy")
+    implementation("javax.annotation:javax.annotation-api")
+    implementation("io.micronaut:micronaut-http-client")
+    implementation("io.micronaut.sql:micronaut-jdbc-hikari")
+    implementation("io.micronaut.data:micronaut-data-jdbc")
+    runtimeOnly("ch.qos.logback:logback-classic")
+    runtimeOnly('org.postgresql:postgresql:42.2.9')
+
+    // swagger annotations
+    implementation("io.swagger.core.v3:swagger-annotations")
+
+    // flyway
+    implementation("io.micronaut.flyway:micronaut-flyway")
+}
+
+
+application {
+    mainClass.set("io.grooviter.memento.cargo.Application")
+}
+// SET TO WHOLE MEMENTO
+//java {
+//    sourceCompatibility = JavaVersion.toVersion("15")
+//    targetCompatibility = JavaVersion.toVersion("11")
+//}
+
+tasks.withType(GroovyCompile) {
+    groovyOptions.forkOptions.jvmArgs.add('-Dgroovy.parameters=true')
+    groovyOptions.forkOptions.jvmArgs.add('-Dmicronaut.openapi.views.spec=rapidoc.enabled=true,rapidoc.theme=light,rapidoc.render-style=read')
+}
+
+
+

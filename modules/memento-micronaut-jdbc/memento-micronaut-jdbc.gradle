@@ -1,17 +1,25 @@
 plugins {
     id 'groovy'
-    id 'java-library'
+    id "io.micronaut.library" version "1.4.2"
 }
 
 repositories {
     mavenCentral()
 }
 
+micronaut {
+    processing {
+        incremental(true)
+        annotations("io.grooviter.memento.mn.*")
+    }
+}
+
 dependencies {
     // memento-base
-    implementation project(':memento-base')
+    compile project(':memento-base')
 
     // micronaut
+    compileOnly("io.micronaut.data:micronaut-data-processor")
     implementation("io.micronaut.groovy:micronaut-runtime-groovy:2.2.0")
     implementation("javax.annotation:javax.annotation-api")
     implementation("com.fasterxml.jackson.core:jackson-databind:$jackson")
