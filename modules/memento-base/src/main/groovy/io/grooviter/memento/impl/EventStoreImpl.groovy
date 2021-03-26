@@ -32,10 +32,10 @@ class EventStoreImpl implements EventStore {
 
     @Override
     void append(Event event) {
-        EventStoreImpl.log.debug("appending [${event.getClass().simpleName}] to memento")
+        log.debug("appending [${event.getClass().simpleName}] to memento")
         this.eventStorePort.append(event, serdePort)
 
-        EventStoreImpl.log.debug("notifying new event persisted")
+        log.debug("notifying new event persisted")
         this.eventBusPort.publish(event, serdePort)
     }
 
@@ -44,9 +44,9 @@ class EventStoreImpl implements EventStore {
         Supplier<Stream<Event>> supplier = supplyListEvents(aggregateId, version)
         Stream<Event> loadedEvents = supplier.get()
 
-        if (EventStoreImpl.log.isDebugEnabled()) {
+        if (log.isDebugEnabled()) {
             Stream<Event> debugEvents = supplier.get()
-            EventStoreImpl.log.debug("loaded ${debugEvents.count()} events for aggregate $aggregateId from version $version")
+            log.debug("loaded ${debugEvents.count()} events for aggregate $aggregateId from version $version")
         }
 
         return loadedEvents
@@ -59,13 +59,18 @@ class EventStoreImpl implements EventStore {
 
     @Override
     Stream<Event> listEvents(UUID aggregateId) {
-        EventStoreImpl.log.debug("loading all events for aggregate $aggregateId")
+        log.debug("loading all events for aggregate $aggregateId")
         return eventStorePort.findAllByAggregateId(aggregateId, serdePort)
     }
 
     @Override
+    Stream<Event> listEvents(String[] aliases) {
+        return eventStorePort.findAllByAliases(aliases, serdePort)
+    }
+
+    @Override
     public <T extends Aggregate> Optional<T> load(UUID aggregateId, Class<T> aggregateType) {
-        EventStoreImpl.log.debug("loading last aggregate snapshot for ${aggregateId}")
+        log.debug("loading last aggregate snapshot for ${aggregateId}")
         Supplier<Optional<T>> fromStream = loadFromStream(aggregateType, aggregateId)
         Supplier<Optional<T>> fromSnapshot = loadFromSnapshot(aggregateId)
         Optional<T> loaded = fromSnapshot.get() | fromStream
@@ -106,20 +111,20 @@ class EventStoreImpl implements EventStore {
         aggregate.eventList.each(this::append)
 
         if (aggregate.eventsLoaded >= this.snapshotThreshold) {
-            EventStoreImpl.log.debug("snapshot threshold reached... creating new snapshot for aggregate ${aggregate.id}")
+            log.debug("snapshot threshold reached... creating new snapshot for aggregate ${aggregate.id}")
             this.snapshot(aggregate)
         }
     }
 
     @Override
     void snapshot(Aggregate aggregate) {
-        EventStoreImpl.log.debug("creating new snapshot for aggregate type -- ${aggregate.getClass().simpleName}")
+        log.debug("creating new snapshot for aggregate type -- ${aggregate.getClass().simpleName}")
         this.eventStorePort.snapshot(aggregate, serdePort)
 
         SnapshotEvent snapshotEvent =
                 new SnapshotEvent(aggregateId: aggregate.id, aggregateType: aggregate.getClass())
 
-        EventStoreImpl.log.debug("notifying new snapshot created")
+        log.debug("notifying new snapshot created")
         this.eventBusPort.publishAsync(snapshotEvent, serdePort)
     }
 }

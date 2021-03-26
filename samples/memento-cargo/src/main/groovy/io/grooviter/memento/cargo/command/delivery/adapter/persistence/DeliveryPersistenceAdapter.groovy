@@ -1,6 +1,7 @@
 package io.grooviter.memento.cargo.command.delivery.adapter.persistence
 
 import io.grooviter.memento.EventStore
+import io.grooviter.memento.cargo.command.common.adapter.eventstore.Command
 import io.grooviter.memento.cargo.command.delivery.application.port.out.DeliveryPorts
 import io.grooviter.memento.cargo.command.delivery.domain.Delivery
 
@@ -13,6 +14,7 @@ class DeliveryPersistenceAdapter implements
     DeliveryPorts.SaveDeliveryPort {
 
     @Inject
+    @Command
     EventStore eventStore
 
     @Override

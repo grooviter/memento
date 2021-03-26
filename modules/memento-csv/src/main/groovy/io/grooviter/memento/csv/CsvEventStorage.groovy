@@ -15,6 +15,9 @@ class CsvEventStorage implements EventStoragePort {
 
     static final String SEPARATOR = '\\|'
 
+    static final Integer ROW_COLUMN_AGGREGATE_ID = 1
+    static final Integer ROW_COLUMN_EVENT_TYPE = 3
+
     File eventStorageFile
     File snapshotStorageFile
 
@@ -58,7 +61,7 @@ class CsvEventStorage implements EventStoragePort {
     }
 
     private static Predicate<String> byAggregateId(UUID id) {
-        return (String row) -> row.split(SEPARATOR)[1] == id.toString()
+        return (String row) -> row.split(SEPARATOR)[ROW_COLUMN_AGGREGATE_ID] == id.toString()
     }
 
     private static Predicate<Event> byVersionGreaterEqual(Integer version) {
@@ -68,7 +71,14 @@ class CsvEventStorage implements EventStoragePort {
     @Override
     Stream<Event> findAllByAggregateId(UUID aggregateId, EventSerdePort serdePort) {
         return Files.lines(eventStorageFile.toPath())
-            .filter(row -> row.split(SEPARATOR)[1] == aggregateId.toString())
+            .filter(row -> row.split(SEPARATOR)[ROW_COLUMN_AGGREGATE_ID] == aggregateId.toString())
+            .map(row -> Mappers.toEvent(row, serdePort))
+    }
+
+    @Override
+    Stream<Event> findAllByAliases(String[] aliases, EventSerdePort serdePort) {
+        return Files.lines(eventStorageFile.toPath())
+            .filter(row -> row.split(SEPARATOR)[ROW_COLUMN_EVENT_TYPE] in aliases)
             .map(row -> Mappers.toEvent(row, serdePort))
     }
 }

@@ -2,7 +2,7 @@ package io.grooviter.memento.cargo.command.delivery.adapter.ebus
 
 import io.grooviter.memento.EventBusPort
 import io.grooviter.memento.EventSerdePort
-import io.grooviter.memento.cargo.common.domain.events.TopicAwareEvent
+import io.grooviter.memento.cargo.shared.TopicAwareEvent
 import io.grooviter.memento.model.Event
 import io.micronaut.context.annotation.Replaces
 import io.micronaut.context.event.ApplicationEventPublisher

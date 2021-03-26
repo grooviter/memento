@@ -8,6 +8,10 @@ CREATE TABLE IF NOT EXISTS memento (
  UNIQUE (aggregate_id, version)
 );
 
+--- UPDATES ARE NOT ALLOWED
+--- REVOKE ALL ON TABLE memento FROM public;
+--- GRANT SELECT, INSERT ON TABLE memento TO public;
+
 CREATE TABLE IF NOT EXISTS memento_snapshot (
  id UUID PRIMARY KEY,
  aggregate_id UUID,
@@ -16,3 +20,7 @@ CREATE TABLE IF NOT EXISTS memento_snapshot (
  json jsonb,
  created_at timestamp NOT NULL
 );
+
+--- UPDATES ARE NOT ALLOWED
+--- REVOKE ALL ON TABLE memento_snapshot FROM public;
+--- GRANT SELECT, INSERT ON TABLE memento_snapshot TO public;

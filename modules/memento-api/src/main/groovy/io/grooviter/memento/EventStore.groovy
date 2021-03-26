@@ -44,6 +44,15 @@ interface EventStore {
     Stream<Event> listEvents(UUID aggregateId)
 
     /**
+     * Lists all events named with the aliases passed as parameter
+     *
+     * @param list of mapped aliases
+     * @return a {@link Stream} of events
+     * @since 0.1.0
+     */
+    Stream<Event> listEvents(String... aliases)
+
+    /**
      * Loads the latest snapshot of the aggregate
      *
      * @param aggregateId

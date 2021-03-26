@@ -1,6 +1,7 @@
 package io.grooviter.memento.cargo.command.participant.adapter.persistence
 
 import io.grooviter.memento.EventStore
+import io.grooviter.memento.cargo.command.common.adapter.eventstore.Command
 import io.grooviter.memento.cargo.command.participant.application.port.out.RegistryPorts
 import io.grooviter.memento.cargo.command.participant.domain.Participant
 
@@ -11,6 +12,7 @@ import javax.inject.Singleton
 class RegistryPersistenceAdapter implements RegistryPorts.SaveParticipantPort {
 
     @Inject
+    @Command
     EventStore eventStore
 
     @Override

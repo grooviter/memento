@@ -47,4 +47,13 @@ abstract class EventRepository implements PageableRepository<EventEntity, UUID> 
     abstract Stream<EventEntity> findAllByAggregateIdAndVersionGreaterThanOrderByVersion(
         UUID aggregateId,
         Integer version)
+
+    /**
+     * Retrieves all events of a given type
+     *
+     * @param aliases list with names of the type of the events
+     * @return an stream of events of the types passed as arguments
+     * @since 0.1.0
+     */
+    abstract Stream<EventEntity> findAllByTypeIn(String[] aliases)
 }

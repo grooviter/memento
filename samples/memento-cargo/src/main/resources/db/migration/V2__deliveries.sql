@@ -9,5 +9,6 @@ CREATE TABLE IF NOT EXISTS cargo_delivery (
 CREATE TABLE IF NOT EXISTS cargo_participant (
     id UUID PRIMARY KEY,
     name varchar(255) NOT NULL,
+    role varchar(255) NOT NULL,
     created_at TIMESTAMP NOT NULL
 );
