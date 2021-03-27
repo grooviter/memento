@@ -13,4 +13,13 @@ class Mappers {
             createdAt: participant.createdAt
         )
     }
+
+    static ParticipantEntity toEntity(Participant participant) {
+        return new ParticipantEntity(
+                id: participant.id,
+                name: participant.name,
+                role: participant.role,
+                createdAt: participant.createdAt
+        )
+    }
 }

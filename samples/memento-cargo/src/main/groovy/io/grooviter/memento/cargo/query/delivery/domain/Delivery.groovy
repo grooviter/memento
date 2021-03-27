@@ -4,7 +4,7 @@ import groovy.transform.Immutable
 
 import java.time.OffsetDateTime
 
-@Immutable
+@Immutable(copyWith = true)
 class Delivery {
     UUID id
     String status
