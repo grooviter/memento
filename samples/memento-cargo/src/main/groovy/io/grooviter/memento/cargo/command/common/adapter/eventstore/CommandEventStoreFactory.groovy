@@ -6,13 +6,6 @@ import io.grooviter.memento.EventSerdePort
 import io.grooviter.memento.EventStoragePort
 import io.grooviter.memento.EventStore
 import io.grooviter.memento.Memento
-import io.grooviter.memento.cargo.command.delivery.domain.Delivery
-import io.grooviter.memento.cargo.command.delivery.domain.events.Loaded
-import io.grooviter.memento.cargo.command.delivery.domain.events.Received
-import io.grooviter.memento.cargo.command.delivery.domain.events.Requested
-import io.grooviter.memento.cargo.command.delivery.domain.events.Unloaded
-import io.grooviter.memento.cargo.command.participant.domain.Participant
-import io.grooviter.memento.cargo.command.participant.domain.events.Registered
 import io.grooviter.memento.impl.JacksonEventSerde
 import io.grooviter.memento.model.Mappings
 import io.micronaut.context.annotation.Factory
@@ -24,35 +17,18 @@ import javax.inject.Singleton
 class CommandEventStoreFactory {
 
     @Singleton
-    @Command
-    Mappings commandMappings() {
-        return Mappings.builder()
-            .addMapping("DELIVERY", Delivery)
-            .addMapping("DELIVERY_REQUESTED", Requested)
-            .addMapping("DELIVERY_LOADED", Loaded)
-            .addMapping("DELIVERY_UNLOADED", Unloaded)
-            .addMapping("DELIVERY_RECEIVED", Received)
-            .addMapping("PARTICIPANT", Participant)
-            .addMapping("PARTICIPANT_REGISTERED", Registered)
-            .build()
-    }
-
-    @Singleton
-    @Command
-    EventSerdePort commandEventSerdePort(
-        @Command Mappings mappings,
-        ObjectMapper objectMapper
-    ) {
-        return new JacksonEventSerde([mappings], objectMapper)
-    }
-
-    @Singleton
-    @Command
+    @CommandQualifier
     EventStore commandEventStore(
-        @Command EventSerdePort eventSerdePort,
+        List<CommandMappingsContainer> mappingsContainer,
+        ObjectMapper objectMapper,
         EventStoragePort eventStoragePort,
         EventBusPort eventBusPort
     ) {
+        List<Mappings> mappingList =
+                mappingsContainer.collect { it.mappings }
+        EventSerdePort eventSerdePort =
+                new JacksonEventSerde(mappingList, objectMapper)
+
         return Memento.builder()
             .serde(eventSerdePort)
             .eventStorage(eventStoragePort)

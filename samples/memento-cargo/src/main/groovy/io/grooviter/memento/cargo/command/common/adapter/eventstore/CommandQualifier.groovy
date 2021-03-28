@@ -6,4 +6,4 @@ import java.lang.annotation.RetentionPolicy
 
 @Qualifier
 @Retention(RetentionPolicy.RUNTIME)
-@interface Command {}
+@interface CommandQualifier {}

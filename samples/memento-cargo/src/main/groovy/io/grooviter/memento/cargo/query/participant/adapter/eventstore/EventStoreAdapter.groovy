@@ -1,7 +1,7 @@
 package io.grooviter.memento.cargo.query.participant.adapter.eventstore
 
 import io.grooviter.memento.EventStore
-import io.grooviter.memento.cargo.query.common.adapter.eventstore.Query
+import io.grooviter.memento.cargo.query.common.adapter.eventstore.QueryQualifier
 import io.grooviter.memento.cargo.query.participant.application.port.out.ParticipantQueryPorts
 import io.grooviter.memento.cargo.query.participant.domain.Participant
 
@@ -15,7 +15,7 @@ class EventStoreAdapter implements ParticipantQueryPorts.ListParticipantsFromEve
     private static final String[] EVENTS = ['PARTICIPANT_REGISTERED']
 
     @Inject
-    @Query
+    @QueryQualifier
     EventStore eventStore
 
     @Override

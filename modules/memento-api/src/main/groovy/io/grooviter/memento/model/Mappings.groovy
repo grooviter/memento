@@ -6,13 +6,13 @@ class Mappings {
     final Map<Class, String> typeToAlias
     final List<Mapping> mappingList
 
-    Mappings(List<Mapping> mappingList) {
-        this.mappingList = mappingList
+    Mappings(List<Mapping> list) {
+        this.mappingList = list
             .asUnmodifiable()
-        this.aliasToType = mappingList
+        this.aliasToType = list
             .collectEntries { Mapping mapping -> [(mapping.alias): mapping.type] }
             .asUnmodifiable()
-        this.typeToAlias = mappingList
+        this.typeToAlias = list
             .collectEntries { Mapping mapping -> [(mapping.type): mapping.alias] }
             .asUnmodifiable()
     }
@@ -33,15 +33,15 @@ class Mappings {
     }
 
     static class Builder {
-        List<Mapping> mappingList = []
+        List<Mapping> builderMappingList = []
 
         Builder addMapping(String alias, Class type) {
-            this.mappingList.add(new Mapping(alias: alias, type: type))
+            this.builderMappingList.add(new Mapping(alias: alias, type: type))
             return this
         }
 
         Mappings build() {
-            return new Mappings(this.mappingList)
+            return new Mappings(this.builderMappingList)
         }
     }
 }

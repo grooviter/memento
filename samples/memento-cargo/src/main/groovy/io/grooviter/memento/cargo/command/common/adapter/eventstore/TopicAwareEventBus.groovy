@@ -1,4 +1,4 @@
-package io.grooviter.memento.cargo.command.delivery.adapter.ebus
+package io.grooviter.memento.cargo.command.common.adapter.eventstore
 
 import io.grooviter.memento.EventBusPort
 import io.grooviter.memento.EventSerdePort

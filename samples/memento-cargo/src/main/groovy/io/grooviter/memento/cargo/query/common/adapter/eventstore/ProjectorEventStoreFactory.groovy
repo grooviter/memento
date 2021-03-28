@@ -6,8 +6,6 @@ import io.grooviter.memento.EventSerdePort
 import io.grooviter.memento.EventStoragePort
 import io.grooviter.memento.EventStore
 import io.grooviter.memento.Memento
-// TODO fix DI of list
-import io.grooviter.memento.cargo.query.participant.adapter.eventstore.events.Created
 import io.grooviter.memento.impl.JacksonEventSerde
 import io.grooviter.memento.model.Mappings
 import io.micronaut.context.annotation.Factory
@@ -19,33 +17,22 @@ import javax.inject.Singleton
 class ProjectorEventStoreFactory {
 
     @Singleton
-    @Query
-    Mappings projectorMappings() {
-        return Mappings.builder()
-            .addMapping('PARTICIPANT_REGISTERED', Created)
-            .build()
-    }
-
-    @Singleton
-    @Query
-    EventSerdePort projectorEventSerdePort(
-            @Query Mappings mappings,
-            ObjectMapper objectMapper
-    ) {
-        return new JacksonEventSerde([mappings], objectMapper)
-    }
-
-    @Singleton
-    @Query
+    @QueryQualifier
     EventStore projectorEventStore(
-            @Query EventSerdePort eventSerdePort,
-            EventStoragePort eventStoragePort,
-            EventBusPort eventBusPort
+        List<QueryMappingsContainer> queryMappingsContainerList,
+        ObjectMapper objectMapper,
+        EventStoragePort eventStoragePort,
+        EventBusPort eventBusPort
     ) {
+        List<Mappings> mappingsList =
+                queryMappingsContainerList.collect { it.mappings }
+        EventSerdePort eventSerdePort =
+                new JacksonEventSerde(mappingsList, objectMapper)
+
         return Memento.builder()
-        .serde(eventSerdePort)
-        .eventStorage(eventStoragePort)
-        .eventBus(eventBusPort)
-        .build()
+            .serde(eventSerdePort)
+            .eventStorage(eventStoragePort)
+            .eventBus(eventBusPort)
+            .build()
     }
 }
