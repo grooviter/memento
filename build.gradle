@@ -1,11 +1,11 @@
 plugins {
-    id 'org.kordamp.gradle.groovy-project' version '0.44.0'   
-    id 'org.kordamp.gradle.jacoco' version '0.44.0'
-    id 'org.kordamp.gradle.codenarc' version '0.44.0'
+    id 'org.kordamp.gradle.groovy-project' version '0.45.0'
+    id 'org.kordamp.gradle.jacoco' version '0.45.0'
+    id 'org.kordamp.gradle.codenarc' version '0.45.0'
 }
 
 config {
-    release = (rootProject.findProperty('release') ?: false).toBoolean()  
+    release = (rootProject.findProperty('release') ?: false).toBoolean()
 
     info {                                                                
         name        = 'Memento'
@@ -42,18 +42,39 @@ config {
         }
     }
     quality {
+
         codenarc {
             toolVersion    = '2.0.0'
             ignoreFailures = true
-            aggregate {
-                excludedProjects ['bookkeeper']
-            }
+            maxPriority1Violations = 0
+            maxPriority2Violations = Integer.MAX_VALUE
+            maxPriority3Violations = Integer.MAX_VALUE
+            aggregate { }
         }
     }
 
     docs {
-        guide {
+        guide { }
+        groovydoc {
+            enabled = true
+            replaceJavadoc = true
+        }
+    }
 
+    publishing {
+        enabled = true
+        signing {
+            enabled = true
+        }
+    }
+}
+
+projects.subprojects {
+    dir('samples') {
+        config {
+            publishing {
+                enabled = false
+            }
         }
     }
 }

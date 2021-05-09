@@ -4,9 +4,6 @@ plugins {
     id("io.micronaut.application") version "1.4.2"
 }
 
-version = "0.1"
-group = "io.grooviter.memento.cargo"
-
 repositories {
     mavenCentral()
 }
@@ -47,11 +44,6 @@ dependencies {
 application {
     mainClass.set("io.grooviter.memento.cargo.Application")
 }
-// SET TO WHOLE MEMENTO
-//java {
-//    sourceCompatibility = JavaVersion.toVersion("15")
-//    targetCompatibility = JavaVersion.toVersion("11")
-//}
 
 tasks.withType(GroovyCompile) {
     groovyOptions.forkOptions.jvmArgs.add('-Dgroovy.parameters=true')

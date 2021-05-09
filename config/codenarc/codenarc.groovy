@@ -37,6 +37,10 @@ ruleset {
     'MissingBlankLineAfterPackage' {
       enabled = false
     }
+    // Error with Groovy 3.0.7 and Codenarc 2.0.0
+    'ClassStartsWithBlankLine' {
+      enabled = false
+    }
   }
   ruleset('rulesets/naming.xml') {
     'MethodName' {
@@ -50,6 +54,10 @@ ruleset {
     }
   }
   ruleset('rulesets/convention.xml') {
+    'CompileStatic' {
+      // TODO see Enterprise Groovy Plugin
+      enabled = false
+    }
     'NoDef' {
       enabled = false
     }

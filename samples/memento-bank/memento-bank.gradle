@@ -4,9 +4,6 @@ plugins {
     id("io.micronaut.application") version "1.4.2"
 }
 
-version = "0.1"
-group = "io.grooviter.memento.bookkeeper"
-
 repositories {
     mavenCentral()
 }

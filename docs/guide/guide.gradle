@@ -7,7 +7,7 @@ repositories {
 asciidoctor {
     baseDirFollowsSourceDir()
     attributes(
-        'memento': memento,
+        'memento': version,
         'toc': 'left',
         'source-highlighter': 'coderay'
     )

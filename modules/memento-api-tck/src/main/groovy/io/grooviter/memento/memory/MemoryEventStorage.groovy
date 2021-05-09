@@ -50,4 +50,9 @@ class MemoryEventStorage implements EventStoragePort {
             .stream()
             .map(row -> Mappers.toEvent(row, serdePort))
     }
+
+    @Override
+    Stream<Event> findAllByAliases(String[] aliases, EventSerdePort serdePort) {
+        return null
+    }
 }

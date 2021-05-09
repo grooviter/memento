@@ -55,9 +55,9 @@ interface EventStore {
     /**
      * Loads the latest snapshot of the aggregate
      *
-     * @param aggregateId
-     * @param aggregateType
-     * @return
+     * @param aggregateId id of the aggregate to load
+     * @param aggregateType type of the aggregate to load
+     * @return an optional object maybe containing the expected aggregate
      * @since 0.1.0
      */
     public <T extends Aggregate> Optional<T> load(UUID aggregateId, Class<T> aggregateType)
