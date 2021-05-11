@@ -4,6 +4,11 @@ plugins {
     id 'org.kordamp.gradle.codenarc' version '0.45.0'
 }
 
+ext {
+    mavenUsername = findProperty("maven.username")
+    mavenPassword = findProperty("maven.password")
+}
+
 config {
     release = (rootProject.findProperty('release') ?: false) as Boolean
 
@@ -26,14 +31,31 @@ config {
             }
         }
 
+        credentials {
+            github {
+                username = findProperty('github.username')
+                password = findProperty('github.password')
+            }
+        }
+
         repositories {
             repository {
-                name = 'mavenReleases'
-                url = 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/'
+                name = 'releases'
+                url  = 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/'
+
+                credentials {
+                    username = mavenUsername
+                    password = mavenPassword
+                }
             }
             repository {
-                name = 'mavenSnapshots'
+                name = 'snapshots'
                 url  = 'https://s01.oss.sonatype.org/content/repositories/snapshots/'
+
+                credentials {
+                    username = mavenUsername
+                    password = mavenPassword
+                }
             }
         }
     }
@@ -56,9 +78,9 @@ config {
 
     quality {
         codenarc {
-            enabled        = false
-            toolVersion    = '2.0.0'
-            ignoreFailures = true
+            enabled                = false
+            toolVersion            = '2.0.0'
+            ignoreFailures         = true
             maxPriority1Violations = 0
             maxPriority2Violations = Integer.MAX_VALUE
             maxPriority3Violations = Integer.MAX_VALUE
@@ -80,8 +102,8 @@ config {
 
     publishing {
         enabled             = true
-        releasesRepository  = 'mavenReleases'
-        snapshotsRepository = 'mavenSnapshots'
+        releasesRepository  = 'releases'
+        snapshotsRepository = 'snapshots'
         signing {
             enabled    = !version.endsWith("-SNAPSHOT")
             keyId      = findProperty("signingKeyId")
@@ -107,8 +129,8 @@ allprojects {
     }
 
     tasks.withType(JavaCompile) {
-        sourceCompatibility = 8
-        targetCompatibility = 8
+        sourceCompatibility = findProperty('sourceCompatibility')
+        targetCompatibility = findProperty('targetCompatibility')
         options.encoding    = 'UTF-8'
     }
 
