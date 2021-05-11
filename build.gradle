@@ -34,13 +34,6 @@ config {
             }
         }
 
-        credentials {
-            github {
-                username = findProperty('github.username')
-                password = findProperty('github.password')
-            }
-        }
-
         repositories {
             repository {
                 name = 'releases'
@@ -94,7 +87,7 @@ config {
     docs {
         guide {
             publish {
-                enabled = shouldRelease
+                enabled = true
                 message = "chores(docs): publish docs for version ${version}"
             }
         }
