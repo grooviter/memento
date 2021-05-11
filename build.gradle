@@ -5,9 +5,9 @@ plugins {
 }
 
 config {
-    release = (rootProject.findProperty('release') ?: false).toBoolean()
+    release = (rootProject.findProperty('release') ?: false) as Boolean
 
-    info {                                                                
+    info {
         name        = 'Memento'
         vendor      = 'Grooviter'
         description = 'Poor man\'s event-store abstraction'
@@ -23,6 +23,17 @@ config {
                 id    = 'marioggar'
                 name  = 'Mario Garcia'
                 roles = ['developer']
+            }
+        }
+
+        repositories {
+            repository {
+                name = 'mavenReleases'
+                url = 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/'
+            }
+            repository {
+                name = 'mavenSnapshots'
+                url  = 'https://s01.oss.sonatype.org/content/repositories/snapshots/'
             }
         }
     }
@@ -41,8 +52,8 @@ config {
             toolVersion = '0.8.6'
         }
     }
-    quality {
 
+    quality {
         codenarc {
             toolVersion    = '2.0.0'
             ignoreFailures = true
@@ -62,9 +73,14 @@ config {
     }
 
     publishing {
-        enabled = true
+        enabled             = true
+        releasesRepository  = 'mavenReleases'
+        snapshotsRepository = 'mavenSnapshots'
         signing {
-            enabled = true
+            enabled    = !version.endsWith("-SNAPSHOT")
+            keyId      = findProperty("signingKeyId")
+            secretKey  = findProperty("signingKey")
+            password   = findProperty("signingPassword")
         }
     }
 }
@@ -82,6 +98,12 @@ projects.subprojects {
 allprojects {
     repositories {
         mavenCentral()
+    }
+
+    tasks.withType(JavaCompile) {
+        sourceCompatibility = 8
+        targetCompatibility = 8
+        options.encoding    = 'UTF-8'
     }
 
     configurations.codenarc {
