@@ -5,13 +5,10 @@
 :baseDir: .
 :stem:
 
-[quote]
-Memento is a minimal EvenStore implementation
-
 [sidebar]
-.Apache
+.Apache 2.0
 ****
-The *Memento* project is open sourced under the http://www.apache.org/licenses/LICENSE-2.0.html[Apache 2 License].
+*Memento* is an open source project and its licensed under the http://www.apache.org/licenses/LICENSE-2.0.html[Apache 2 License].
 ****
 
 include::intro.adoc[]

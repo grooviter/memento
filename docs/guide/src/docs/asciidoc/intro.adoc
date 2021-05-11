@@ -1,5 +1,7 @@
 == Introduction
 
+Memento tries to provide a high level abstraction for different EventStore implementations.
+
 === Event Sourcing
 
 [quote, , 'Event Sourcing definition at https://www.eventstore.com/blog/what-is-event-sourcing[eventstore.com]']
@@ -55,7 +57,7 @@ image::different_reads.png[alt="Heterogeneous reads", align="center", width="70%
 - https://martinfowler.com/bliki/CQRS.html[Martin Fowler on CQRS]
 - https://www.eventstore.com/blog/what-is-event-sourcing[EventStore database article on Event Sourcing]
 
-=== Memento Overview
+=== Overview
 
 A Memento `EventStore` instance is built on top of these three components:
 
