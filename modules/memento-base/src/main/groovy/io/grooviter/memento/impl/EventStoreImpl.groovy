@@ -41,7 +41,7 @@ class EventStoreImpl implements EventStore {
 
     @Override
     Stream<Event> listEvents(UUID aggregateId, Integer version) {
-        Supplier<Stream<Event>> supplier = supplyListEvents(aggregateId, version)
+        Supplier<Stream<Event>> supplier = supplyListEvents(aggregateId, version + 1)
         Stream<Event> loadedEvents = supplier.get()
 
         if (log.isDebugEnabled()) {
