@@ -1,0 +1,20 @@
+plugins {
+    id("groovy")
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Memento
+    implementation project(':memento-csv')
+    implementation("org.codehaus.groovy:groovy-json:$groovy")
+
+    testImplementation("org.spockframework:spock-core:$spockframework")
+    testImplementation("org.spockframework:spock-junit4:$spockframework")
+}
+
+test {
+    useJUnitPlatform()
+}
