@@ -39,6 +39,7 @@ config {
     }
 
     licensing {
+        enabled = false
         includes = ['**/*.groovy', '**/*.gradle']
         licenses {
             license {
@@ -55,6 +56,7 @@ config {
 
     quality {
         codenarc {
+            enabled        = false
             toolVersion    = '2.0.0'
             ignoreFailures = true
             maxPriority1Violations = 0
@@ -65,7 +67,11 @@ config {
     }
 
     docs {
-        guide { }
+        guide {
+            publish {
+                message = "chores(docs): publish docs for version ${version}"
+            }
+        }
         groovydoc {
             enabled = true
             replaceJavadoc = true
