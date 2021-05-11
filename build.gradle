@@ -7,15 +7,18 @@ plugins {
 ext {
     mavenUsername = findProperty("maven.username")
     mavenPassword = findProperty("maven.password")
+    shouldRelease = "${findProperty('release')}".toBoolean()
 }
 
 config {
-    release = (rootProject.findProperty('release') ?: false) as Boolean
+    release = shouldRelease
 
     info {
-        name        = 'Memento'
-        vendor      = 'Grooviter'
-        description = 'Poor man\'s event-store abstraction'
+        name          = 'Memento'
+        vendor        = 'Grooviter'
+        description   = 'Memento tries to provide a high level abstraction for different EventStore implementations'
+        inceptionYear = '2021'
+        tags          = ['event-sourcing', 'event-store']
 
         links {
             website      = 'https://github.com/grooviter/memento'
@@ -91,6 +94,7 @@ config {
     docs {
         guide {
             publish {
+                enabled = shouldRelease
                 message = "chores(docs): publish docs for version ${version}"
             }
         }
