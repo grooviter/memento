@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 2.0.10">
+<title>Memento</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
+<link rel="stylesheet" href="./asciidoctor.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body class="book toc2 toc-left">
+<div id="header">
+<h1>Memento</h1>
+<div class="details">
+<span id="revnumber">version 0.1.0-SNAPSHOT</span>
+</div>
+<div id="toc" class="toc2">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_introduction">1. Introduction</a>
+<ul class="sectlevel2">
+<li><a href="#_event_sourcing">1.1. Event Sourcing</a></li>
+<li><a href="#_overview">1.2. Overview</a></li>
+</ul>
+</li>
+<li><a href="#_getting_started">2. Getting started</a></li>
+<li><a href="#_general_usage">3. General Usage</a></li>
+<li><a href="#_micronaut_data">4. Micronaut Data</a></li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div id="preamble">
+<div class="sectionbody">
+<div class="sidebarblock">
+<div class="content">
+<div class="title">Apache 2.0</div>
+<div class="paragraph">
+<p><strong>Memento</strong> is an open source project and its licensed under the <a href="http://www.apache.org/licenses/LICENSE-2.0.html">Apache 2 License</a>.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_introduction"><a class="anchor" href="#_introduction"></a>1. Introduction</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Memento tries to provide a high level abstraction for different EventStore implementations.</p>
+</div>
+<div class="sect2">
+<h3 id="_event_sourcing"><a class="anchor" href="#_event_sourcing"></a>1.1. Event Sourcing</h3>
+<div class="quoteblock">
+<blockquote>
+Event Sourcing is an alternative way to persist data. In contrast with state-oriented persistence that only keeps
+the latest version of the entity state, Event Sourcing stores each state mutation as a separate record called an event.
+</blockquote>
+<div class="attribution">
+&#8212; Event Sourcing definition at <a href="https://www.eventstore.com/blog/what-is-event-sourcing">eventstore.com</a>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Every change is registered in an event log</strong> so that we can keep an audit trail. For instance imagine we&#8217;d like to
+keep track of our bank account deposits and withdrawals:</p>
+</div>
+<div class="imageblock text-center">
+<div class="content">
+<img src="images/ledger.png" alt="Ledger" width="75%">
+</div>
+</div>
+<div class="paragraph">
+<p>We&#8217;re using our account id (AID), a version number to denote the order of events happening, the type of event, the value
+deposited or withdraw and finally when the event happened. Storing data this way enables among other things:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>HISTORICAL REVIEW</strong>: we can <strong>re-create the state of our account at any given point in time</strong></p>
+</li>
+<li>
+<p><strong>HETEROGENEOUS USES OF THE DATA</strong>: we can create <strong>different views of the data</strong> depending on our requirements</p>
+</li>
+</ul>
+</div>
+<div class="sect3">
+<h4 id="_historical_review"><a class="anchor" href="#_historical_review"></a>1.1.1. Historical Review</h4>
+<div class="paragraph">
+<p>Marting Fowler <a href="https://martinfowler.com/eaaDev/EventSourcing.html">highlights historical review features</a>
+of event sourcing:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>COMPLETE REBUILD</strong>: rebuild the application state from the event log</p>
+</li>
+<li>
+<p><strong>TEMPORAL QUERY</strong>: determine the application state in a given moment in time</p>
+</li>
+<li>
+<p><strong>EVENT REPLAY</strong>: the possibility to compute consequences of past events and maybe replay those events differently</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Following our bank account example, I may want to know why my balance is at a given state, and the bank must be able
+to show every event until the current state so that there&#8217;s no doubt about the current balance.
+If the bank stored only the last state that information would be lost forever. However because we&#8217;ve stored every
+event we can answer that question:</p>
+</div>
+<div class="imageblock text-center">
+<div class="content">
+<img src="images/temporal_query.png" alt="Temporal Query" width="70%">
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_heterogeneous_uses"><a class="anchor" href="#_heterogeneous_uses"></a>1.1.2. Heterogeneous Uses</h4>
+<div class="paragraph">
+<p>Another use case is <strong>when the data the system is producing is being consumed in different ways by different systems</strong>.</p>
+</div>
+<div class="paragraph">
+<p>For example, in an e-commerce application, different departments could be interested in different views of the data,
+accounting might be interested in sales whereas marketing could be interested in user fidelity. In such systems there
+are always more reads than writes.</p>
+</div>
+<div class="paragraph">
+<p>An architectural pattern applied to this use case is <strong>CQRS</strong> (<strong>C</strong>ommand/<strong>Q</strong>uery <strong>R</strong>esponsibility <strong>S</strong>egregation).
+This pattern uses the idea of using a different model for create information than the model used for reading information.</p>
+</div>
+<div class="paragraph">
+<p>An <strong>event log</strong> could be used in this context to be <strong>the single source of truth</strong> of the system.
+From there any reading system could read from the event store and then create their own views to serve to their clients.</p>
+</div>
+<div class="imageblock text-center">
+<div class="content">
+<img src="images/different_reads.png" alt="Heterogeneous reads" width="70%">
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_resources"><a class="anchor" href="#_resources"></a>1.1.3. Resources</h4>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://martinfowler.com/eaaDev/EventSourcing.html">Martin Fowler on Event Sourcing</a></p>
+</li>
+<li>
+<p><a href="https://martinfowler.com/bliki/CQRS.html">Martin Fowler on CQRS</a></p>
+</li>
+<li>
+<p><a href="https://www.eventstore.com/blog/what-is-event-sourcing">EventStore database article on Event Sourcing</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_overview"><a class="anchor" href="#_overview"></a>1.2. Overview</h3>
+<div class="paragraph">
+<p>A Memento <code>EventStore</code> instance is built on top of these three components:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>STORAGE</strong>: were events and snapshots are going to be stored (database, csv&#8230;&#8203;)</p>
+</li>
+<li>
+<p><strong>EVENT-BUS</strong>:: system to notify when events/snapshots are stored</p>
+</li>
+<li>
+<p><strong>SERDE</strong>: (serialization/deserialization) how to serialize/deserialize events to/from the storage</p>
+</li>
+</ul>
+</div>
+<div class="sect3">
+<h4 id="_storage"><a class="anchor" href="#_storage"></a>1.2.1. Storage</h4>
+<div class="paragraph">
+<p>Basically where the events are going to be stored. That could be anything, a database, a csv file, queue systems. The
+only thing that matters is that the event information could be stored in such a way it could be later be used again
+to replay the state of the system.</p>
+</div>
+<div class="paragraph">
+<p>The event structure is:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>ID</p>
+</li>
+<li>
+<p>AGGREGATE ID</p>
+</li>
+<li>
+<p>VERSION</p>
+</li>
+<li>
+<p>JSON</p>
+</li>
+<li>
+<p>DATE</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_event_bus"><a class="anchor" href="#_event_bus"></a>1.2.2. Event Bus</h4>
+<div class="paragraph">
+<p>Regarding that the event store is more used for reading than writing, there could be many systems that are interested
+in knowing when a new event has been stored in the system. In order to be able to publish notifications the event store
+uses an event bus. An event bus is a system that delivers messages from message producers to message receivers.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_serde"><a class="anchor" href="#_serde"></a>1.2.3. SERDE</h4>
+<div class="paragraph">
+<p>Because the payload of the event is JSON, we need to convert the event information to JSON and then re-create the
+object from that JSON. Serde is an acronym for <strong>SER</strong>ialization/<strong>DE</strong>serialization.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_getting_started"><a class="anchor" href="#_getting_started"></a>2. Getting started</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The following example presents a <strong>Document</strong> aggregate, the Document can support different types of events such as <strong>creating a document</strong> (Created)
+or <strong>appending text</strong> to the document (Appended).</p>
+</div>
+<div class="paragraph">
+<p>Also an <strong>EventStore</strong> implementation is created to store the aggregate events. This particular implementation stores events
+and snapshots <strong>as csv files</strong>.</p>
+</div>
+<div class="listingblock">
+<div class="title">save an aggregate</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="annotation">@Grab</span>(<span class="string"><span class="delimiter">'</span><span class="content">io.grooviter:memento-base:0.1.0</span><span class="delimiter">'</span></span>)
+<span class="keyword">import</span> <span class="include">io.grooviter.memento.*</span>
+
+<span class="comment">// EVENTS....</span>
+<span class="type">class</span> <span class="class">Created</span> <span class="directive">extends</span> <span class="predefined-type">Event</span> {
+   <span class="predefined-type">String</span> title, author
+}
+
+<span class="type">class</span> <span class="class">Appended</span> <span class="directive">extends</span> <span class="predefined-type">Event</span> {
+   <span class="predefined-type">String</span> content
+}
+
+<span class="comment">// AGGREGATE...</span>
+<span class="type">class</span> <span class="class">Document</span> <span class="directive">extends</span> Aggregate {
+   <span class="predefined-type">String</span> title, author, content
+
+   <span class="directive">static</span> <span class="predefined-type">Document</span> create(<span class="predefined-type">String</span> title, <span class="predefined-type">String</span> author) {
+       <span class="predefined-type">Document</span> document = <span class="keyword">new</span> <span class="predefined-type">Document</span>(<span class="key">id</span>: <span class="predefined-type">UUID</span>.randomUUID())
+       <span class="keyword">return</span> document.apply(<span class="keyword">new</span> Created(<span class="key">title</span>: title, <span class="key">author</span>: author, <span class="key">version</span>: nextVersion))
+   }
+
+   <span class="predefined-type">Document</span> append(<span class="predefined-type">String</span> content) {
+       <span class="keyword">return</span> <span class="local-variable">this</span>.apply(<span class="keyword">new</span> Appended(<span class="key">content</span>: <span class="string"><span class="delimiter">&quot;</span><span class="inline"><span class="inline-delimiter">${</span><span class="local-variable">this</span>.content<span class="inline-delimiter">}</span></span><span class="content"> </span><span class="inline"><span class="inline-delimiter">$</span>content</span><span class="delimiter">&quot;</span></span>, <span class="key">version</span>: nextVersion))
+   }
+
+   <span class="predefined-type">Document</span> apply(Created created) {
+       <span class="local-variable">super</span>.apply(created)
+       <span class="local-variable">this</span>.title = created.title
+       <span class="local-variable">this</span>.author = created.author
+       <span class="keyword">return</span> <span class="local-variable">this</span>
+   }
+
+   <span class="predefined-type">Document</span> apply(Appended appended) {
+       <span class="local-variable">super</span>.apply(appended)
+       <span class="local-variable">this</span>.content += appended.content
+       <span class="keyword">return</span> <span class="local-variable">this</span>
+   }
+}
+
+<span class="comment">// EVENTSTORE IMPLEMENTATION...</span>
+EventStore eventStore = Memento.builder()
+    .csvEventStorage(<span class="string"><span class="delimiter">'</span><span class="content">/tmp/events.csv</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">/tmp/snapshots.csv</span><span class="delimiter">'</span></span>)
+    .snapshotThreshold(<span class="integer">2</span>) <span class="comment">// snapshot every 2 events</span>
+    .build()
+
+<span class="comment">// CREATING AND STORING AN AGGREGATE....</span>
+<span class="predefined-type">Document</span> document = <span class="predefined-type">Document</span>.create(<span class="string"><span class="delimiter">&quot;</span><span class="content">Memento</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Christopher Nolan</span><span class="delimiter">&quot;</span></span>)
+    .append(<span class="string"><span class="delimiter">&quot;</span><span class="content">A man who, as a result of an injury,</span><span class="delimiter">&quot;</span></span>)
+    .append(<span class="string"><span class="delimiter">&quot;</span><span class="content">, has anterograde amnesia</span><span class="delimiter">&quot;</span></span>)
+    .append(<span class="string"><span class="delimiter">&quot;</span><span class="content">and has short-term memory loss</span><span class="delimiter">&quot;</span></span>)
+    .append(<span class="string"><span class="delimiter">&quot;</span><span class="content">approximately every fifteen minutes.</span><span class="delimiter">&quot;</span></span>)
+
+<span class="comment">// SAVING THE AGGREGATE's EVENTS...</span>
+eventStore.save(document)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If you take a look at the <strong>events.csv</strong> file you will see the following.</p>
+</div>
+<div class="listingblock">
+<div class="title">events.csv</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="shell">...-6740974752dc|1|DocumentCreated|{&quot;title&quot;:&quot;Memento&quot;,&quot;aggregateId&quot;:&quot;5f5469ba-a031-4ccb...
+...-6740974752dc|2|Appended|{&quot;content&quot;:&quot;A man who, as a result of an injury&quot;,&quot;aggregate...
+...</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_general_usage"><a class="anchor" href="#_general_usage"></a>3. General Usage</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>TODO</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_micronaut_data"><a class="anchor" href="#_micronaut_data"></a>4. Micronaut Data</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>TODO</p>
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Version 0.1.0-SNAPSHOT<br>
+Last updated 2021-05-11 17:08:53 +0200
+</div>
+</div>
+<link rel="stylesheet" href="./coderay-asciidoctor.css">
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  messageStyle: "none",
+  tex2jax: {
+    inlineMath: [["\\(", "\\)"]],
+    displayMath: [["\\[", "\\]"]],
+    ignoreClass: "nostem|nolatexmath"
+  },
+  asciimath2jax: {
+    delimiters: [["\\$", "\\$"]],
+    ignoreClass: "nostem|noasciimath"
+  },
+  TeX: { equationNumbers: { autoNumber: "none" } }
+})
+MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
+  MathJax.InputJax.AsciiMath.postfilterHooks.Add(function (data, node) {
+    if ((node = data.script.parentNode) && (node = node.parentNode) && node.classList.contains('stemblock')) {
+      data.math.root.display = "block"
+    }
+    return data
+  })
+})
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>
+</body>
+</html>
