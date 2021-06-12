@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import io.grooviter.memento.cargo.query.delivery.adapter.eventstore.events.Created
 import io.grooviter.memento.cargo.query.delivery.adapter.eventstore.events.Delivered
 import io.grooviter.memento.cargo.query.delivery.adapter.eventstore.events.OnRoute
-import io.grooviter.memento.cargo.shared.TopicAwareEvent
+import io.grooviter.memento.mn.MicroEventBus
 import io.micronaut.context.event.ApplicationEventPublisher
 import io.micronaut.runtime.event.annotation.EventListener
 
@@ -22,7 +22,7 @@ class TopicAwareEventDispatcher {
     ObjectMapper objectMapper
 
     @EventListener
-    void onTopicAwareEventListener(TopicAwareEvent event) {
+    void onTopicAwareEventListener(MicroEventBus.TopicAwareEvent event) {
         switch(event.topic) {
             case 'DELIVERY_REQUESTED':                     publishCreated(event)  ; break
             case 'DELIVERY_RECEIVED':                      publishReceived(event) ; break
@@ -30,7 +30,7 @@ class TopicAwareEventDispatcher {
         }
     }
 
-    private void publishCreated(TopicAwareEvent event) {
+    private void publishCreated(MicroEventBus.TopicAwareEvent event) {
         Created created = objectMapper
             .readerFor(Created)
             .readValue(event.json)
@@ -38,7 +38,7 @@ class TopicAwareEventDispatcher {
         applicationEventPublisher.publishEvent(created)
     }
 
-    private void publishReceived(TopicAwareEvent event) {
+    private void publishReceived(MicroEventBus.TopicAwareEvent event) {
         Delivered received = objectMapper
             .readerFor(Delivered)
             .readValue(event.json)
@@ -46,7 +46,7 @@ class TopicAwareEventDispatcher {
         applicationEventPublisher.publishEvent(received)
     }
 
-    private void publishOnRoute(TopicAwareEvent event) {
+    private void publishOnRoute(MicroEventBus.TopicAwareEvent event) {
         OnRoute onRoute = objectMapper
             .readerFor(OnRoute)
             .readValue(event.json)
