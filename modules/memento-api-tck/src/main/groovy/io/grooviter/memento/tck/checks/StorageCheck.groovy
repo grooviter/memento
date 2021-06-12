@@ -13,6 +13,7 @@ class StorageCheck {
         Document document = Fixtures.fullLifeCycleDocument()
         eventStore.save(document)
 
+        assert document.version == 5
         assert eventStore.listEvents(document.id).count() == 5, "wrong number number of events"
         assert eventStore.listEvents(document.id).any {it instanceof DocumentCreated }
         assert eventStore.listEvents(document.id).any { it instanceof DocumentDeleted }

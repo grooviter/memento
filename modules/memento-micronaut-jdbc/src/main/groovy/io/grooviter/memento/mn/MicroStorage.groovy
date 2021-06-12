@@ -56,7 +56,7 @@ class MicroStorage implements EventStoragePort {
     @Override
     Stream<Event> findAllByAggregateId(UUID aggregateId, EventSerdePort serdePort) {
         return eventRepository
-            .findAllByAggregateId(aggregateId)
+            .findAllByAggregateIdOrderByVersion(aggregateId)
             .map(eve -> Mappers.toEvent(serdePort, eve))
     }
 

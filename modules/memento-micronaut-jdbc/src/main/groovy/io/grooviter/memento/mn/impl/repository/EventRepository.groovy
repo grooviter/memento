@@ -34,7 +34,7 @@ abstract class EventRepository implements PageableRepository<EventEntity, UUID> 
      * @return an {@link Stream} of {@link EventEntity} instances
      * @since 0.1.0
      */
-    abstract Stream<EventEntity> findAllByAggregateId(UUID aggregateId)
+    abstract Stream<EventEntity> findAllByAggregateIdOrderByVersion(UUID aggregateId)
 
     /**
      * Retrieves all events from a given aggregate from a specific version
