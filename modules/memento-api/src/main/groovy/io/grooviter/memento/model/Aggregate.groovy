@@ -46,9 +46,12 @@ class Aggregate {
         if (event.aggregateId){
             assert this.id == event.aggregateId
         }
-        event.aggregateId = this.id
-        this.version = event.version
 
+        event.aggregateId = this.id
+        event.id      = event.id ?: UUID.randomUUID()
+        event.version = event.version ?: nextVersion
+
+        this.version = event.version
         this.eventList.add(event)
         this.eventsLoaded++
     }
