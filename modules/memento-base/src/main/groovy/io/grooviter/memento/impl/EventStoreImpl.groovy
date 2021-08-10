@@ -89,6 +89,7 @@ class EventStoreImpl implements EventStore {
     private <T extends Aggregate> Supplier<Optional<T>> loadFromSnapshot(UUID id) {
         return () -> eventStorePort
             .findByAggregateIdOrderByVersionDesc(id, serdePort)
+        // TODO missing check latest event and load events from snapshot version forwards
             .map((Aggregate agg) -> agg.applyEvents(this.listEvents(agg.id, agg.version)))
     }
 
@@ -109,16 +110,30 @@ class EventStoreImpl implements EventStore {
     @Override
     void save(Aggregate aggregate) {
         aggregate.eventList.each(this::append)
-
-        if (aggregate.eventsLoaded >= this.snapshotThreshold) {
-            log.debug("snapshot threshold reached... creating new snapshot for aggregate ${aggregate.id}")
-            this.snapshot(aggregate)
-        }
+        snapshot(aggregate)
     }
 
     @Override
     void snapshot(Aggregate aggregate) {
-        log.debug("creating new snapshot for aggregate type -- ${aggregate.getClass().simpleName}")
+        // TODO this would only create ONE snapshot PER EVENT from THIS POINT
+        // TODO if the number of eventsLoaded + the number of events since last snapshot version >= snapshotThreshold
+        // TODO THEN do snapshot
+
+        int aggregateVersion = aggregate.version
+        int snapshotVersion = this
+            .eventStorePort
+            .findByAggregateIdOrderByVersionDesc(aggregate.id, this.serdePort)
+            .map(agg -> agg.version)
+            .orElse(0)
+
+        int delta = aggregateVersion - snapshotVersion
+
+        if (this.snapshotThreshold > delta) {
+            log.debug("snapshot creation skipped")
+            return
+        }
+
+        log.debug("creating new snapshot [type: '${aggregate.getClass().simpleName}' -- id: '${aggregate.id}']")
         this.eventStorePort.snapshot(aggregate, serdePort)
 
         SnapshotEvent snapshotEvent =
