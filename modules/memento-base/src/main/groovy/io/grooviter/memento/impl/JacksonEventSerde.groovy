@@ -22,9 +22,7 @@ class JacksonEventSerde implements EventSerdePort {
             .map(Mappings::new)
             .orElse(Mappings.builder().build())
 
-        this.mapper = Optional
-            .ofNullable(objectMapper)
-            .orElse(defaultObjectMapper())
+        this.mapper = objectMapper ?: defaultObjectMapper()
     }
 
     JacksonEventSerde() {
