@@ -57,15 +57,15 @@ class CsvEventStorage implements EventStoragePort {
         return Files.lines(eventStorageFile.toPath())
             .filter(byAggregateId(aggregateId))
             .map(row -> Mappers.toEvent(row, serdePort))
-            .filter(byVersionGreaterEqual(version))
+            .filter(byVersionGreaterThan(version))
     }
 
     private static Predicate<String> byAggregateId(UUID id) {
         return (String row) -> row.split(SEPARATOR)[ROW_COLUMN_AGGREGATE_ID] == id.toString()
     }
 
-    private static Predicate<Event> byVersionGreaterEqual(Integer version) {
-        return (Event event) -> event.version >= version
+    private static Predicate<Event> byVersionGreaterThan(Integer version) {
+        return (Event event) -> event.version > version
     }
 
     @Override

@@ -41,7 +41,7 @@ class EventStoreImpl implements EventStore {
 
     @Override
     Stream<Event> listEvents(UUID aggregateId, Integer version) {
-        Supplier<Stream<Event>> supplier = supplyListEvents(aggregateId, version + 1)
+        Supplier<Stream<Event>> supplier = supplyListEvents(aggregateId, version)
         Stream<Event> loadedEvents = supplier.get()
 
         if (log.isDebugEnabled()) {
@@ -89,7 +89,6 @@ class EventStoreImpl implements EventStore {
     private <T extends Aggregate> Supplier<Optional<T>> loadFromSnapshot(UUID id) {
         return () -> eventStorePort
             .findByAggregateIdOrderByVersionDesc(id, serdePort)
-        // TODO missing check latest event and load events from snapshot version forwards
             .map((Aggregate agg) -> agg.applyEvents(this.listEvents(agg.id, agg.version)))
     }
 
@@ -115,10 +114,6 @@ class EventStoreImpl implements EventStore {
 
     @Override
     void snapshot(Aggregate aggregate) {
-        // TODO this would only create ONE snapshot PER EVENT from THIS POINT
-        // TODO if the number of eventsLoaded + the number of events since last snapshot version >= snapshotThreshold
-        // TODO THEN do snapshot
-
         int aggregateVersion = aggregate.version
         int snapshotVersion = this
             .eventStorePort
