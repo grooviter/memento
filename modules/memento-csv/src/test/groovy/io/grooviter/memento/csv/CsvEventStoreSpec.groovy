@@ -3,7 +3,6 @@ package io.grooviter.memento.csv
 import io.grooviter.memento.EventStore
 import io.grooviter.memento.Memento
 import io.grooviter.memento.tck.EventStoreTck
-import io.grooviter.memento.tck.Utils
 import io.grooviter.memento.tck.fixtures.Fixtures
 import spock.lang.Specification
 
@@ -30,8 +29,8 @@ class CsvEventStoreSpec extends Specification {
 
     void 'check tck compliance with mappings'() {
         given: 'destination files'
-        File events = Utils.tempEventsFile()
-        File snapshots = Utils.tempSnapshotsFile()
+        File events = tempEventsFile()
+        File snapshots = tempSnapshotsFile()
 
         when: 'creating event store with those mappings'
         EventStore eventStore = Memento.builder()

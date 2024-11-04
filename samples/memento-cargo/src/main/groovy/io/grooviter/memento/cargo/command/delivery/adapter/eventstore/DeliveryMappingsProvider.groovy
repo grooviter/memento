@@ -11,12 +11,12 @@ import io.grooviter.memento.cargo.command.delivery.domain.events.Unloaded
 import io.grooviter.memento.model.Mappings
 import io.micronaut.context.annotation.Factory
 
-import javax.inject.Provider
-import javax.inject.Singleton
+import jakarta.inject.Singleton
 
-@Singleton
-class DeliveryMappingsProvider implements Provider<CommandMappingsContainer> {
+@Factory
+class DeliveryMappingsProvider {
 
+    @Singleton
     CommandMappingsContainer get() {
         Mappings mappings = Mappings.builder()
             .addMapping("DELIVERY", Delivery)

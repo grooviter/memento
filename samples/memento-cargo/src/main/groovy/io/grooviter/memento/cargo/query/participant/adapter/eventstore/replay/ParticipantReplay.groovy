@@ -5,8 +5,8 @@ import io.grooviter.memento.cargo.query.participant.application.port.in.UseCases
 import io.micronaut.context.event.ApplicationEventListener
 import io.micronaut.runtime.event.ApplicationStartupEvent
 
-import javax.inject.Inject
-import javax.inject.Singleton
+import jakarta.inject.Inject
+import jakarta.inject.Singleton
 
 /**
  * This class triggers the participants replay mechanism at startup

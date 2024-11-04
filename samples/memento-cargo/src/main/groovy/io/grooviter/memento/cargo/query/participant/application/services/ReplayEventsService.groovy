@@ -4,8 +4,9 @@ import groovy.util.logging.Slf4j
 import io.grooviter.memento.cargo.query.participant.application.port.in.UseCases
 import io.grooviter.memento.cargo.query.participant.application.port.out.ParticipantQueryPorts
 
-import javax.inject.Inject
-import javax.inject.Singleton
+import jakarta.inject.Inject
+import jakarta.inject.Singleton
+import jakarta.transaction.Transactional
 
 @Slf4j
 @Singleton
@@ -21,6 +22,7 @@ class ReplayEventsService implements UseCases.ReplayEventsCommand {
     ParticipantQueryPorts.SaveParticipantPort saveParticipantPort
 
     @Override
+    @Transactional
     void replay() {
         if (!participantCountPort.count()) {
             log.debug("no participants present replaying...")

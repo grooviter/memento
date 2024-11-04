@@ -1,7 +1,6 @@
 plugins {
-    id 'org.kordamp.gradle.groovy-project' version '0.45.0'
-    id 'org.kordamp.gradle.jacoco' version '0.45.0'
-    id 'org.kordamp.gradle.codenarc' version '0.45.0'
+    id 'org.kordamp.gradle.groovy-project'
+    id 'org.kordamp.gradle.codenarc'
 }
 
 ext {
@@ -14,7 +13,7 @@ config {
     release = shouldRelease
 
     info {
-        name          = 'Memento'
+        name          = 'Mementox'
         vendor        = 'Grooviter'
         description   = 'Memento tries to provide a high level abstraction for different EventStore implementations'
         inceptionYear = '2021'
@@ -110,22 +109,17 @@ config {
     }
 }
 
-projects.subprojects {
-    dir('samples') {
-        config {
-            publishing {
-                enabled = false
-            }
-        }
-    }
-}
 
 allprojects {
     repositories {
         mavenCentral()
     }
 
-    tasks.withType(JavaCompile) {
+    tasks.withType(PublishToMavenRepository).configureEach {
+        enabled = it.project.projectDir.parentFile.name != 'samples'
+    }
+
+    tasks.withType(JavaCompile).configureEach {
         sourceCompatibility = findProperty('sourceCompatibility')
         targetCompatibility = findProperty('targetCompatibility')
         options.encoding    = 'UTF-8'

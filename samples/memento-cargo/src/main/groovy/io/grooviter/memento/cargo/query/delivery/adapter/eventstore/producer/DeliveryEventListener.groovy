@@ -7,8 +7,8 @@ import io.grooviter.memento.cargo.query.delivery.adapter.eventstore.events.Deliv
 import io.grooviter.memento.cargo.query.delivery.adapter.eventstore.events.OnRoute
 import io.micronaut.runtime.event.annotation.EventListener
 
-import javax.inject.Inject
-import javax.inject.Singleton
+import jakarta.inject.Inject
+import jakarta.inject.Singleton
 
 @Slf4j
 @Singleton

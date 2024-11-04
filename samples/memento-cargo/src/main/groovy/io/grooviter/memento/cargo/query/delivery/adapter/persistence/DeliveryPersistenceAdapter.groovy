@@ -4,8 +4,8 @@ import io.grooviter.memento.cargo.query.delivery.adapter.persistence.repository.
 import io.grooviter.memento.cargo.query.delivery.application.port.out.DeliveryQueryPorts
 import io.grooviter.memento.cargo.query.delivery.domain.Delivery
 
-import javax.inject.Inject
-import javax.inject.Singleton
+import jakarta.inject.Inject
+import jakarta.inject.Singleton
 
 @Singleton
 class DeliveryPersistenceAdapter implements

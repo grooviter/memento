@@ -5,8 +5,8 @@ import io.grooviter.memento.cargo.query.participant.application.port.in.UseCases
 import io.grooviter.memento.cargo.query.participant.adapter.eventstore.events.Created
 import io.micronaut.runtime.event.annotation.EventListener
 
-import javax.inject.Inject
-import javax.inject.Singleton
+import jakarta.inject.Inject
+import jakarta.inject.Singleton
 
 @Slf4j
 @Singleton

@@ -4,9 +4,9 @@ import io.grooviter.memento.cargo.command.participant.application.port.in.UseCas
 import io.grooviter.memento.cargo.command.participant.application.port.out.RegistryPorts
 import io.grooviter.memento.cargo.command.participant.domain.Participant
 
-import javax.inject.Inject
-import javax.inject.Singleton
-import javax.transaction.Transactional
+import jakarta.inject.Inject
+import jakarta.inject.Singleton
+import io.micronaut.transaction.annotation.Transactional
 
 @Singleton
 class RegisterParticipantService implements UseCases.RegisterParticipantCommand {

@@ -12,40 +12,40 @@ and snapshots **as csv files**.
 @Grab('io.grooviter:memento-base:0.1.0')
 import io.grooviter.memento.*
 
-// EVENTS....
-class Created extends Event {
-   String title, author
+import static java.util.UUID.randomUUID
+
+// EVENTS...
+class Created extends Event<Document> {
+    String title, author
 }
 
-class Appended extends Event {
-   String content
+class Appended extends Event<Document> {
+    String content
 }
 
 // AGGREGATE...
 class Document extends Aggregate {
-   String title, author, content
+    String title, author, content = ''
 
-   static Document create(String title, String author) {
-       Document document = new Document(id: UUID.randomUUID())
-       return document.apply(new Created(title: title, author: author, version: nextVersion))
-   }
+    static Document create(String title, String author) {
+        return new Document(id: randomUUID()).apply(new Created(title: title, author: author))
+    }
 
-   Document append(String content) {
-       return this.apply(new Appended(content: "${this.content} $content", version: nextVersion))
-   }
+    Document append(String content) {
+        return this.apply(new Appended(content: content))
+    }
 
-   Document apply(Created created) {
-       super.apply(created)
-       this.title = created.title
-       this.author = created.author
-       return this
-   }
+    // EVENT_CONFIGURATION...
+    @Override
+    void configure() {
+        // bind(Class<Event>) applies event properties to Aggregate
+        bind(Created)
 
-   Document apply(Appended appended) {
-       super.apply(appended)
-       this.content += appended.content
-       return this
-   }
+        // bind(Class<Event>, Closure) applies event to Aggregate as defined in closure
+        bind(Appended) { Document doc, Appended event ->
+            doc.content += event.content
+        }
+    }
 }
 
 // EVENTSTORE IMPLEMENTATION...
@@ -70,7 +70,7 @@ If you take a look at the **events.csv** file you will see the following.
 [source, shell]
 .events.csv
 ----
-...-6740974752dc|1|DocumentCreated|{"title":"Memento","aggregateId":"5f5469ba-a031-4ccb...
+...-6740974752dc|1|Created|{"title":"Memento","aggregateId":"5f5469ba-a031-4ccb...
 ...-6740974752dc|2|Appended|{"content":"A man who, as a result of an injury","aggregate...
 ...
 ----

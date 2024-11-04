@@ -2,35 +2,32 @@ package io.grooviter.memento.bank.account.domain.events
 
 final class Events {
 
-    static Created created(String iban, String name, Integer version) {
-        return Created.builder().iban(iban).name(name).version(version).build()
+    static Created created(String iban, String name) {
+        return Created.builder().iban(iban).name(name).build()
     }
 
-    static Closed close(Integer version) {
-        return Closed.builder().version(version).build()
+    static Closed closed() {
+        return Closed.builder().build()
     }
 
-    static DepositMade depositMade(BigDecimal amount, BigDecimal newBalance, Integer version) {
+    static DepositMade depositMade(BigDecimal amount, BigDecimal newBalance) {
         return DepositMade.builder()
             .amount(amount)
             .balance(newBalance)
-            .version(version)
             .build()
     }
 
-    static WithdrawalMade withdrawal(BigDecimal amount, BigDecimal newBalance, Integer version) {
+    static WithdrawalMade withdrawal(BigDecimal amount, BigDecimal newBalance) {
         return WithdrawalMade.builder()
             .amount(amount)
             .balance(newBalance)
-            .version(version)
             .build()
     }
 
-    static CommissionApplied commission(BigDecimal amount, BigDecimal newBalance, Integer version) {
+    static CommissionApplied commissionAdded(BigDecimal amount, BigDecimal newBalance) {
         return CommissionApplied.builder()
             .amount(amount)
             .balance(newBalance)
-            .version(version)
             .build()
     }
 }

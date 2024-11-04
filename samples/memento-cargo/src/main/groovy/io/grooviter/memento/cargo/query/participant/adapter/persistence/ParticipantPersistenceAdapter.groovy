@@ -4,8 +4,8 @@ import io.grooviter.memento.cargo.query.participant.adapter.persistence.reposito
 import io.grooviter.memento.cargo.query.participant.application.port.out.ParticipantQueryPorts
 import io.grooviter.memento.cargo.query.participant.domain.Participant
 
-import javax.inject.Inject
-import javax.inject.Singleton
+import jakarta.inject.Inject
+import jakarta.inject.Singleton
 import java.util.stream.Collectors
 import java.util.stream.StreamSupport
 

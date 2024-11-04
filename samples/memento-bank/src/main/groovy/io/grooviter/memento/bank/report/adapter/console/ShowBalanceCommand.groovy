@@ -7,7 +7,7 @@ import io.grooviter.memento.bank.report.application.port.in.UseCases
 import io.grooviter.memento.bank.report.domain.Balance
 import picocli.CommandLine
 
-import javax.inject.Inject
+import jakarta.inject.Inject
 
 @CompileStatic
 @CommandLine.Command(version = "1.0", name = "account-balance", description = "shows a given account balance")

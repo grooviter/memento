@@ -4,7 +4,7 @@ import io.grooviter.memento.bank.account.application.port.in.UseCases
 import io.grooviter.memento.bank.infra.console.AllCommands
 import picocli.CommandLine
 
-import javax.inject.Inject
+import jakarta.inject.Inject
 
 @CommandLine.Command(
     version = "1.0",

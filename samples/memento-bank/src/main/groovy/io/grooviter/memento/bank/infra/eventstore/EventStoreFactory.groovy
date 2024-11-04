@@ -10,7 +10,7 @@ import io.grooviter.memento.bank.infra.Configuration
 import io.grooviter.memento.model.Mappings
 import io.micronaut.context.annotation.Factory
 
-import javax.inject.Singleton
+import jakarta.inject.Singleton
 
 @Factory
 class EventStoreFactory {

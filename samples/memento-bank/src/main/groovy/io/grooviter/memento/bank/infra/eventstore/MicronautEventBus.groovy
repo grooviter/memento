@@ -5,8 +5,8 @@ import io.grooviter.memento.EventSerdePort
 import io.grooviter.memento.model.Event
 import io.micronaut.context.event.ApplicationEventPublisher
 
-import javax.inject.Inject
-import javax.inject.Singleton
+import jakarta.inject.Inject
+import jakarta.inject.Singleton
 
 @Singleton
 class MicronautEventBus implements EventBusPort {

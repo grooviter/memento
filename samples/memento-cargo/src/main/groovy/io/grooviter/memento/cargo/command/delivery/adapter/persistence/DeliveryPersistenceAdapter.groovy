@@ -5,8 +5,8 @@ import io.grooviter.memento.cargo.command.common.adapter.eventstore.CommandQuali
 import io.grooviter.memento.cargo.command.delivery.application.port.out.DeliveryPorts
 import io.grooviter.memento.cargo.command.delivery.domain.Delivery
 
-import javax.inject.Inject
-import javax.inject.Singleton
+import jakarta.inject.Inject
+import jakarta.inject.Singleton
 
 @Singleton
 class DeliveryPersistenceAdapter implements

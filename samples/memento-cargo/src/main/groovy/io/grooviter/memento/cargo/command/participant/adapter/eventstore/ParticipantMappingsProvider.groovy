@@ -4,13 +4,14 @@ import io.grooviter.memento.cargo.command.common.adapter.eventstore.CommandMappi
 import io.grooviter.memento.cargo.command.participant.domain.Participant
 import io.grooviter.memento.cargo.command.participant.domain.events.Registered
 import io.grooviter.memento.model.Mappings
+import io.micronaut.context.annotation.Factory
+import jakarta.inject.Provider
+import jakarta.inject.Singleton
 
-import javax.inject.Provider
-import javax.inject.Singleton
+@Factory
+class ParticipantMappingsProvider {
 
-@Singleton
-class ParticipantMappingsProvider implements Provider<CommandMappingsContainer> {
-
+    @Singleton
     CommandMappingsContainer get() {
         Mappings mappings = Mappings.builder()
             .addMapping("PARTICIPANT", Participant)

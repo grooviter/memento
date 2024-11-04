@@ -4,8 +4,8 @@ import io.grooviter.memento.bank.projector.application.port.in.UseCases
 import io.grooviter.memento.bank.projector.application.port.out.ProjectorPorts
 import io.grooviter.memento.bank.projector.domain.Balance
 
-import javax.inject.Inject
-import javax.inject.Singleton
+import jakarta.inject.Inject
+import jakarta.inject.Singleton
 
 @Singleton
 class UpdateAccountBalanceService implements UseCases.UpdateAccountBalance {

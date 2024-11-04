@@ -8,8 +8,8 @@ import io.micronaut.http.annotation.PathVariable
 import io.micronaut.http.annotation.Post
 import io.swagger.v3.oas.annotations.tags.Tag
 
-import javax.inject.Inject
-import javax.validation.Valid
+import jakarta.inject.Inject
+import jakarta.validation.Valid
 
 @Tag(name = 'DELIVERY')
 @Controller("/delivery")

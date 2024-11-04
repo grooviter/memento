@@ -4,8 +4,8 @@ import io.grooviter.memento.cargo.query.common.adapter.eventstore.QueryMappingsC
 import io.grooviter.memento.cargo.query.participant.adapter.eventstore.events.Created
 import io.grooviter.memento.model.Mappings
 
-import javax.inject.Provider
-import javax.inject.Singleton
+import jakarta.inject.Provider
+import jakarta.inject.Singleton
 
 @Singleton
 class ParticipantMappingsProvider implements Provider<QueryMappingsContainer> {

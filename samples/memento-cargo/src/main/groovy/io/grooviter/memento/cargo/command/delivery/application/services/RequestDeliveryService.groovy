@@ -4,9 +4,9 @@ import io.grooviter.memento.cargo.command.delivery.application.port.in.UseCases
 import io.grooviter.memento.cargo.command.delivery.application.port.out.DeliveryPorts
 import io.grooviter.memento.cargo.command.delivery.domain.Delivery
 
-import javax.inject.Inject
-import javax.inject.Singleton
-import javax.transaction.Transactional
+import jakarta.inject.Inject
+import jakarta.inject.Singleton
+import io.micronaut.transaction.annotation.Transactional
 
 @Singleton
 class RequestDeliveryService implements UseCases.RequestNewDeliveryCommand {

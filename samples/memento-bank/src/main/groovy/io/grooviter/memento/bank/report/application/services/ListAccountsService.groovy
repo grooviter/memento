@@ -4,8 +4,8 @@ import io.grooviter.memento.bank.report.application.port.in.UseCases
 import io.grooviter.memento.bank.report.application.port.out.ReportPorts
 import io.grooviter.memento.bank.report.domain.Account
 
-import javax.inject.Inject
-import javax.inject.Singleton
+import jakarta.inject.Inject
+import jakarta.inject.Singleton
 
 @Singleton
 class ListAccountsService implements UseCases.ListAccountsQuery {

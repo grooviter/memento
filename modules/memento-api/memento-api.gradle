@@ -8,8 +8,8 @@ repositories {
 }
 
 dependencies {
-    compile("org.codehaus.groovy:groovy:$groovy")
-    compile("org.slf4j:slf4j-api:$slf4j")
+    api("org.apache.groovy:groovy:$groovy")
+    api("org.slf4j:slf4j-api:$slf4j")
     implementation("com.fasterxml.jackson.core:jackson-databind:$jackson")
     implementation("com.fasterxml.jackson.core:jackson-annotations:$jackson")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jackson")

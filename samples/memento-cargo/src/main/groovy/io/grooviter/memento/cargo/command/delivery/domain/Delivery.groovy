@@ -16,13 +16,7 @@ class Delivery extends Aggregate {
     OffsetDateTime finishedAt
 
     static Delivery beginDeliveryProcess(UUID requesterId) {
-        Delivery delivery = new Delivery(id: UUID.randomUUID())
-        Requested requested = Requested.builder()
-            .clientId(requesterId)
-            .version(delivery.nextVersion)
-            .build()
-
-        return delivery.apply(requested)
+        return new Delivery(id: UUID.randomUUID()).apply(Requested.builder().clientId(requesterId).build())
 
     }
 
@@ -31,7 +25,6 @@ class Delivery extends Aggregate {
 
         Prepared prepared = Prepared.builder()
             .employeeId(employeeId)
-            .version(nextVersion)
             .build()
 
         return this.apply(prepared)
@@ -43,7 +36,6 @@ class Delivery extends Aggregate {
         Loaded loaded = Loaded.builder()
             .driverId(driverId)
             .comments(comments)
-            .version(nextVersion)
             .build()
 
         return this.apply(loaded)
@@ -55,7 +47,6 @@ class Delivery extends Aggregate {
         Unloaded unloaded = Unloaded.builder()
             .driverId(driverId)
             .comments(comments)
-            .version(nextVersion)
             .build()
 
         return this.apply(unloaded)
@@ -67,46 +58,37 @@ class Delivery extends Aggregate {
         Received received = Received.builder()
             .clientId(clientId)
             .comments(comments)
-            .version(nextVersion)
             .build()
 
         return this.apply(received)
     }
 
-    private Delivery apply(Requested event) {
-        super.apply(event)
-        this.deliveredTo = event.clientId
-        this.currentStatus = Status.REQUESTED
-        this.startedAt = event.createdAt
-        return this
-    }
+    void configure() {
+        bind(Requested) { agg, event ->
+            agg.deliveredTo = event.clientId
+            agg.currentStatus = Status.REQUESTED
+            agg.startedAt = event.createdAt
+        }
 
-    private Delivery apply(Prepared event) {
-        super.apply(event)
-        this.deliveryCurrentHolder = event.employeeId
-        this.currentStatus = Status.PREPARED
-        return this
-    }
+        bind(Prepared) { agg, event ->
+            agg.deliveryCurrentHolder = event.employeeId
+            agg.currentStatus = Status.PREPARED
+        }
 
-    private Delivery apply(Loaded event) {
-        super.apply(event)
-        this.deliveryCurrentHolder = event.driverId
-        this.currentStatus = Status.ON_ROUTE
-        return this
-    }
+        bind(Loaded) { agg, event ->
+            agg.deliveryCurrentHolder = event.driverId
+            agg.currentStatus = Status.ON_ROUTE
+        }
 
-    private Delivery apply(Unloaded event) {
-        super.apply(event)
-        this.deliveryCurrentHolder = event.driverId
-        this.currentStatus = Status.CLOSE_TO_POSITION
-        return this
-    }
+        bind(Unloaded) { agg, event ->
+            agg.deliveryCurrentHolder = event.driverId
+            agg.currentStatus = Status.CLOSE_TO_POSITION
+        }
 
-    private Delivery apply(Received event) {
-        super.apply(event)
-        this.deliveryCurrentHolder = event.clientId
-        this.currentStatus = Status.CLOSED
-        this.finishedAt = event.createdAt
-        return this
+        bind(Received) { agg, event ->
+            agg.deliveryCurrentHolder = event.clientId
+            agg.currentStatus = Status.CLOSED
+            agg.finishedAt = event.createdAt
+        }
     }
 }

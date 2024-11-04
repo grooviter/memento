@@ -4,7 +4,7 @@ import io.grooviter.memento.EventStore
 import io.grooviter.memento.bank.account.application.port.out.AccountPorts
 import io.grooviter.memento.bank.account.domain.Account
 
-import javax.inject.Singleton
+import jakarta.inject.Singleton
 
 @Singleton
 class PersistenceAdapter implements

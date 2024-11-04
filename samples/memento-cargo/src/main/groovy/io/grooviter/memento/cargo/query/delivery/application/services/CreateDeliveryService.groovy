@@ -5,9 +5,9 @@ import io.grooviter.memento.cargo.query.delivery.application.port.in.UseCases
 import io.grooviter.memento.cargo.query.delivery.application.port.out.DeliveryQueryPorts
 import io.grooviter.memento.cargo.query.delivery.domain.Delivery
 
-import javax.inject.Inject
-import javax.inject.Singleton
-import javax.transaction.Transactional
+import jakarta.inject.Inject
+import jakarta.inject.Singleton
+import io.micronaut.transaction.annotation.Transactional
 
 @Slf4j
 @Singleton

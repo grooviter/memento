@@ -8,8 +8,8 @@ import io.grooviter.memento.bank.projector.domain.events.Deposit
 import io.grooviter.memento.bank.projector.domain.events.Withdrawal
 import io.micronaut.runtime.event.annotation.EventListener
 
-import javax.inject.Inject
-import javax.inject.Singleton
+import jakarta.inject.Inject
+import jakarta.inject.Singleton
 
 @Slf4j
 @Singleton

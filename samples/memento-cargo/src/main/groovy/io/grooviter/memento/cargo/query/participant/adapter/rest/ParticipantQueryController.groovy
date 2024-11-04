@@ -6,7 +6,7 @@ import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get
 import io.swagger.v3.oas.annotations.tags.Tag
 
-import javax.inject.Inject
+import jakarta.inject.Inject
 
 @Tag(name = 'PARTICIPANT')
 @Controller('/participant')

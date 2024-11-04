@@ -3,9 +3,9 @@ package io.grooviter.memento.cargo.query.delivery.application.services
 import io.grooviter.memento.cargo.query.delivery.application.port.in.UseCases
 import io.grooviter.memento.cargo.query.delivery.application.port.out.DeliveryQueryPorts
 
-import javax.inject.Inject
-import javax.inject.Singleton
-import javax.transaction.Transactional
+import jakarta.inject.Inject
+import jakarta.inject.Singleton
+import io.micronaut.transaction.annotation.Transactional
 
 @Singleton
 class MarkAsDeliveredService implements UseCases.MarkAsDeliveredCommand {

@@ -18,17 +18,13 @@ class Participant extends Aggregate {
         Registered succeeded = Registered.builder()
             .name(name)
             .role(role)
-            .version(register.nextVersion)
             .build()
 
         return register.apply(succeeded)
     }
 
-    Participant apply(Registered event) {
-        super.apply(event)
-        this.name = event.name
-        this.role = event.role
-        this.createdAt = event.createdAt
-        return this
+    @Override
+    void configure() {
+        bind(Registered)
     }
 }

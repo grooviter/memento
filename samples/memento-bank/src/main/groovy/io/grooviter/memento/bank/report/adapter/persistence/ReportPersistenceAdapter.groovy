@@ -6,8 +6,8 @@ import io.grooviter.memento.bank.report.application.port.out.ReportPorts
 import io.grooviter.memento.bank.report.domain.Account
 import io.grooviter.memento.bank.report.domain.Balance
 
-import javax.inject.Inject
-import javax.inject.Singleton
+import jakarta.inject.Inject
+import jakarta.inject.Singleton
 import java.time.OffsetDateTime
 import java.util.function.Predicate
 import java.util.stream.Collectors

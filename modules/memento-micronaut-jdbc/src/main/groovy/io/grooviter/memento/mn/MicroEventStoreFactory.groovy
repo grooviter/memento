@@ -8,7 +8,7 @@ import io.grooviter.memento.EventSerdePort
 import io.micronaut.context.annotation.Factory
 import io.micronaut.context.annotation.Value
 
-import javax.inject.Singleton
+import jakarta.inject.Singleton
 
 @Factory
 class MicroEventStoreFactory {

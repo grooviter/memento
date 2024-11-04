@@ -5,7 +5,7 @@ import io.grooviter.memento.bank.account.domain.events.*
 import io.grooviter.memento.model.Mappings
 import io.micronaut.context.annotation.Factory
 
-import javax.inject.Singleton
+import jakarta.inject.Singleton
 
 @Factory
 class MappingsFactory {

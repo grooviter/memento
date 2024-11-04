@@ -8,8 +8,8 @@ import io.grooviter.memento.mn.impl.repository.SnapshotRepository
 import io.grooviter.memento.model.Aggregate
 import io.grooviter.memento.model.Event
 
-import javax.inject.Inject
-import javax.inject.Singleton
+import jakarta.inject.Inject
+import jakarta.inject.Singleton
 import java.util.stream.Stream
 
 /**

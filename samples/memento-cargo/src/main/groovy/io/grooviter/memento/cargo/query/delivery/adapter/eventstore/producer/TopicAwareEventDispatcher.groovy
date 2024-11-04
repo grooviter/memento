@@ -8,8 +8,8 @@ import io.grooviter.memento.mn.MicroEventBus
 import io.micronaut.context.event.ApplicationEventPublisher
 import io.micronaut.runtime.event.annotation.EventListener
 
-import javax.inject.Inject
-import javax.inject.Singleton
+import jakarta.inject.Inject
+import jakarta.inject.Singleton
 
 @Singleton
 @SuppressWarnings("unused")

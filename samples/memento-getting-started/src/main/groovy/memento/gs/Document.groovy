@@ -1,43 +1,55 @@
 package memento.gs
 
+import io.grooviter.memento.EventStore
+import io.grooviter.memento.Memento
 import io.grooviter.memento.model.Aggregate
 import io.grooviter.memento.model.Event
 
-/**
- * Represents a text document
- *
- * @since 0.1.0
- */
+import static java.util.UUID.randomUUID
+
+
 class Document extends Aggregate {
     String title, author, content = ''
 
-    static class Created extends Event {
+    static class Created extends Event<Document> {
         String title, author
     }
 
-    static class Appended extends Event {
+    static class Appended extends Event<Document> {
         String content
     }
 
     static Document create(String title, String author) {
-        Document document = new Document(id: UUID.randomUUID())
-        return document.apply(new Created(title: title, author: author, version: document.nextVersion))
+        return new Document(id: randomUUID()).apply(new Created(title: title, author: author))
     }
 
     Document append(String content) {
-        return this.apply(new Appended(content: content, version: nextVersion))
+        return this.apply(new Appended(content: content))
     }
 
-    private Document apply(Created created) {
-        super.apply(created)
-        this.title = created.title
-        this.author = created.author
-        return this
+    @Override
+    void configure() {
+        bind(Created)
+        bind(Appended) { Document doc, Appended event ->
+            doc.content += event.content
+        }
     }
 
-    private Document apply(Appended appended) {
-        super.apply(appended)
-        this.content += appended.content
-        return this
+    static void main(String[] args) {
+        // EVENTSTORE IMPLEMENTATION...
+        EventStore eventStore = Memento.builder()
+                .csvStorage('/tmp/events.csv', '/tmp/snapshots.csv')
+                .snapshotThreshold(2) // snapshot every 2 events
+                .build()
+
+        // CREATING AND STORING AN AGGREGATE....
+        Document document = Document.create("Memento", "Christopher Nolan")
+                .append("A man who, as a result of an injury,")
+                .append(", has anterograde amnesia")
+                .append("and has short-term memory loss")
+                .append("approximately every fifteen minutes.")
+
+        // SAVING THE AGGREGATE's EVENTS...
+        eventStore.save(document)
     }
 }

@@ -6,8 +6,8 @@ import io.grooviter.memento.mn.MicroEventBus
 import io.micronaut.context.event.ApplicationEventListener
 import io.micronaut.context.event.ApplicationEventPublisher
 
-import javax.inject.Inject
-import javax.inject.Singleton
+import jakarta.inject.Inject
+import jakarta.inject.Singleton
 
 @Singleton
 class TopicAwareEventDispatcher implements ApplicationEventListener<MicroEventBus.TopicAwareEvent> {

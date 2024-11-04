@@ -1,72 +1,50 @@
 package io.grooviter.memento.bank.account.domain
 
-import io.grooviter.memento.bank.account.domain.errors.NotEmptyAccount
-import io.grooviter.memento.bank.account.domain.errors.NotEnoughFunds
+import groovy.contracts.Ensures
+import groovy.contracts.Invariant
 import io.grooviter.memento.bank.account.domain.events.*
 import io.grooviter.memento.model.Aggregate
 
+import static io.grooviter.memento.bank.account.domain.events.Events.closed
+import static io.grooviter.memento.bank.account.domain.events.Events.commissionAdded
+import static io.grooviter.memento.bank.account.domain.events.Events.created
+import static io.grooviter.memento.bank.account.domain.events.Events.depositMade
+import static io.grooviter.memento.bank.account.domain.events.Events.withdrawal
+import static java.util.UUID.randomUUID
+
+@Invariant({ balance <= 0 })
 class Account extends Aggregate {
     String iban, name
     Boolean closed = Boolean.FALSE
     BigDecimal balance = BigDecimal.ZERO
 
     static Account create(String iban, String holderName) {
-        Account account = new Account(id: UUID.randomUUID())
-        return account.apply(Events.created(iban, holderName, account.nextVersion))
+        return new Account(id: randomUUID()).apply(created(iban, holderName))
     }
 
     Account deposit(BigDecimal amount) {
-        return this.apply(Events.depositMade(amount, this.balance.add(amount), nextVersion))
+        return this.apply(depositMade(amount, this.balance.add(amount)))
     }
 
+    @Ensures({ this.balance.subtract(amount).signum() == -1 })
     Account withdrawal(BigDecimal amount) {
-        if (this.balance.subtract(amount).signum() == -1) {
-            throw new NotEnoughFunds()
-        }
-
-        return this.apply(Events.withdrawal(amount, this.balance.subtract(amount), nextVersion))
+        return this.apply(withdrawal(amount, this.balance.subtract(amount)))
     }
 
+    @Ensures({ this.balance > 0 })
     Account close() {
-        if (this.balance >= 0) {
-            throw new NotEmptyAccount()
-        }
-
-        return this.apply(Events.close(nextVersion))
+        return this.apply(closed())
     }
 
     Account commission(BigDecimal amount) {
-        return this.apply(Events.commission(amount, this.balance.subtract(amount), nextVersion))
+        return this.apply(commissionAdded(amount, this.balance.subtract(amount)))
     }
 
-    Account apply(Created created) {
-        super.apply(created)
-        this.iban = created.iban
-        this.name = created.name
-        return this
-    }
-
-    Account apply(Closed deleted) {
-        super.apply(deleted)
-        this.closed = Boolean.TRUE
-        return this
-    }
-
-    Account apply(DepositMade depositMade) {
-        super.apply(depositMade)
-        this.balance = depositMade.balance
-        return this
-    }
-
-    Account apply(CommissionApplied commissionApplied) {
-        super.apply(commissionApplied)
-        this.balance = commissionApplied.balance
-        return this
-    }
-
-    Account apply(WithdrawalMade withdrawalMade) {
-        super.apply(withdrawalMade)
-        this.balance = withdrawalMade.balance
-        return this
+    @Override
+    void configure() {
+        bind(Created, DepositMade, CommissionApplied, WithdrawalMade)
+        bind(Closed) { doc, event ->
+            doc.closed = Boolean.TRUE
+        }
     }
 }
