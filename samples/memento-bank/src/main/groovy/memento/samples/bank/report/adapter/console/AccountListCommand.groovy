@@ -3,7 +3,7 @@ package memento.samples.bank.report.adapter.console
 import groovy.transform.CompileStatic
 import memento.samples.bank.infra.console.AllCommands
 import memento.samples.bank.infra.console.Utils
-import memento.samples.bank.report.application.port.in.UseCases
+import memento.samples.bank.report.application.port.UseCases
 import memento.samples.bank.report.domain.Account
 import picocli.CommandLine
 

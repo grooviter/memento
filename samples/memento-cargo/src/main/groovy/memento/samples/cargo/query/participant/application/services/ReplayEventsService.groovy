@@ -1,8 +1,8 @@
 package memento.samples.cargo.query.participant.application.services
 
 import groovy.util.logging.Slf4j
-import memento.samples.cargo.query.participant.application.port.in.UseCases
-import memento.samples.cargo.query.participant.application.port.out.ParticipantQueryPorts
+import memento.samples.cargo.query.participant.application.port.UseCases
+import memento.samples.cargo.query.participant.application.port.ParticipantQueryPorts
 
 import jakarta.inject.Inject
 import jakarta.inject.Singleton

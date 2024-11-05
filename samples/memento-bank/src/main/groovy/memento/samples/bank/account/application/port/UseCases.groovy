@@ -1,4 +1,4 @@
-package memento.samples.bank.account.application.port.in
+package memento.samples.bank.account.application.port
 
 import groovy.transform.builder.Builder
 

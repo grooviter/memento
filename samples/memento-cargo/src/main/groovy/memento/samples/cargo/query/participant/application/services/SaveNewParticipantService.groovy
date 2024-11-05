@@ -1,7 +1,7 @@
 package memento.samples.cargo.query.participant.application.services
 
-import memento.samples.cargo.query.participant.application.port.in.UseCases
-import memento.samples.cargo.query.participant.application.port.out.ParticipantQueryPorts
+import memento.samples.cargo.query.participant.application.port.UseCases
+import memento.samples.cargo.query.participant.application.port.ParticipantQueryPorts
 import memento.samples.cargo.query.participant.domain.Participant
 
 import jakarta.inject.Inject

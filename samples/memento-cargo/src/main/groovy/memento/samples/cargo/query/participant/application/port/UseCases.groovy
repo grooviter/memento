@@ -1,4 +1,4 @@
-package memento.samples.cargo.query.participant.application.port.in
+package memento.samples.cargo.query.participant.application.port
 
 import groovy.transform.builder.Builder
 import memento.samples.cargo.query.participant.domain.Participant

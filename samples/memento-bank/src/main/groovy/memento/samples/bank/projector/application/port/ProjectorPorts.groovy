@@ -1,4 +1,4 @@
-package memento.samples.bank.projector.application.port.out
+package memento.samples.bank.projector.application.port
 
 import memento.samples.bank.projector.domain.Account
 import memento.samples.bank.projector.domain.Balance

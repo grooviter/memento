@@ -3,7 +3,7 @@ package memento.samples.bank.projector.adapter.eventstore
 import com.fasterxml.jackson.databind.ObjectMapper
 import groovy.util.logging.Slf4j
 import memento.samples.bank.infra.eventstore.TopicAwareEvent
-import memento.samples.bank.projector.application.port.in.UseCases
+import memento.samples.bank.projector.application.port.UseCases
 import memento.samples.bank.projector.domain.events.Deposit
 import memento.samples.bank.projector.domain.events.Withdrawal
 import io.micronaut.runtime.event.annotation.EventListener

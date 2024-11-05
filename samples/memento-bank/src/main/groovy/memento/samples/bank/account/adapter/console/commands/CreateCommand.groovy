@@ -1,6 +1,6 @@
 package memento.samples.bank.account.adapter.console.commands
 
-import memento.samples.bank.account.application.port.in.UseCases
+import memento.samples.bank.account.application.port.UseCases
 import memento.samples.bank.infra.console.AllCommands
 import picocli.CommandLine
 

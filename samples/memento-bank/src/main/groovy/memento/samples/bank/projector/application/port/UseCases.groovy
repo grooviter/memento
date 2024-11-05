@@ -1,4 +1,4 @@
-package memento.samples.bank.projector.application.port.in
+package memento.samples.bank.projector.application.port
 
 import groovy.transform.builder.Builder
 

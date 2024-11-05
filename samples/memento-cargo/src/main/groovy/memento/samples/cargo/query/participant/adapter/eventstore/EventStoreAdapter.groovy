@@ -2,7 +2,7 @@ package memento.samples.cargo.query.participant.adapter.eventstore
 
 import memento.EventStore
 import memento.samples.cargo.query.common.adapter.eventstore.QueryQualifier
-import memento.samples.cargo.query.participant.application.port.out.ParticipantQueryPorts
+import memento.samples.cargo.query.participant.application.port.ParticipantQueryPorts
 import memento.samples.cargo.query.participant.domain.Participant
 
 import jakarta.inject.Inject

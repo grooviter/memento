@@ -1,4 +1,4 @@
-package memento.samples.cargo.command.delivery.application.port.in
+package memento.samples.cargo.command.delivery.application.port
 
 import groovy.transform.builder.Builder
 

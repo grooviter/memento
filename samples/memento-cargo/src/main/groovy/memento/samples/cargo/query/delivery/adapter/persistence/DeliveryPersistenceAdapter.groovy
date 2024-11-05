@@ -1,7 +1,7 @@
 package memento.samples.cargo.query.delivery.adapter.persistence
 
 import memento.samples.cargo.query.delivery.adapter.persistence.repository.DeliveryEntityRepository
-import memento.samples.cargo.query.delivery.application.port.out.DeliveryQueryPorts
+import memento.samples.cargo.query.delivery.application.port.DeliveryQueryPorts
 import memento.samples.cargo.query.delivery.domain.Delivery
 
 import jakarta.inject.Inject

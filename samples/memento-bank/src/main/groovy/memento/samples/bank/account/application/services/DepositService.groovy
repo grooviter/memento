@@ -1,7 +1,7 @@
 package memento.samples.bank.account.application.services
 
-import memento.samples.bank.account.application.port.in.UseCases
-import memento.samples.bank.account.application.port.out.AccountPorts
+import memento.samples.bank.account.application.port.UseCases
+import memento.samples.bank.account.application.port.AccountPorts
 
 import jakarta.inject.Inject
 import jakarta.inject.Singleton

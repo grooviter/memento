@@ -1,7 +1,7 @@
 package memento.samples.bank.report.application.services
 
-import memento.samples.bank.report.application.port.in.UseCases
-import memento.samples.bank.report.application.port.out.ReportPorts
+import memento.samples.bank.report.application.port.UseCases
+import memento.samples.bank.report.application.port.ReportPorts
 import memento.samples.bank.report.domain.Account
 
 import jakarta.inject.Inject

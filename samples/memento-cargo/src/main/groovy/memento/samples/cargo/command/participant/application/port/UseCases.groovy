@@ -1,4 +1,4 @@
-package memento.samples.cargo.command.participant.application.port.in
+package memento.samples.cargo.command.participant.application.port
 
 import groovy.transform.builder.Builder
 import memento.samples.cargo.command.participant.domain.ParticipantRole

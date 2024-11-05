@@ -1,4 +1,4 @@
-package memento.samples.bank.report.application.port.in
+package memento.samples.bank.report.application.port
 
 import groovy.transform.builder.Builder
 import memento.samples.bank.report.domain.Account

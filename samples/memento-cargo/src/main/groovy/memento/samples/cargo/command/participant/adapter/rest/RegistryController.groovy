@@ -1,7 +1,7 @@
 package memento.samples.cargo.command.participant.adapter.rest
 
 import memento.samples.cargo.command.participant.adapter.rest.payload.NewParticipantPayload
-import memento.samples.cargo.command.participant.application.port.in.UseCases
+import memento.samples.cargo.command.participant.application.port.UseCases
 import io.micronaut.http.annotation.Body
 import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Post

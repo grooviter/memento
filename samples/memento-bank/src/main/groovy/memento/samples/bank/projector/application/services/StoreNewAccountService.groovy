@@ -1,8 +1,8 @@
 package memento.samples.bank.projector.application.services
 
 import groovy.util.logging.Slf4j
-import memento.samples.bank.projector.application.port.in.UseCases
-import memento.samples.bank.projector.application.port.out.ProjectorPorts
+import memento.samples.bank.projector.application.port.UseCases
+import memento.samples.bank.projector.application.port.ProjectorPorts
 import memento.samples.bank.projector.domain.Account
 
 import jakarta.inject.Inject

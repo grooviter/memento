@@ -1,7 +1,7 @@
 package memento.samples.cargo.query.participant.adapter.eventstore.replay
 
 import groovy.util.logging.Slf4j
-import memento.samples.cargo.query.participant.application.port.in.UseCases
+import memento.samples.cargo.query.participant.application.port.UseCases
 import io.micronaut.context.event.ApplicationEventListener
 import io.micronaut.runtime.event.ApplicationStartupEvent
 

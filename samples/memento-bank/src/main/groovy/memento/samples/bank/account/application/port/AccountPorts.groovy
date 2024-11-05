@@ -1,4 +1,4 @@
-package memento.samples.bank.account.application.port.out
+package memento.samples.bank.account.application.port
 
 import memento.samples.bank.account.domain.Account
 import memento.model.Event

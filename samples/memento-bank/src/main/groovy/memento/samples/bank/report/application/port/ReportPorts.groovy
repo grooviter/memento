@@ -1,4 +1,4 @@
-package memento.samples.bank.report.application.port.out
+package memento.samples.bank.report.application.port
 
 import memento.samples.bank.report.domain.Account
 import memento.samples.bank.report.domain.Balance

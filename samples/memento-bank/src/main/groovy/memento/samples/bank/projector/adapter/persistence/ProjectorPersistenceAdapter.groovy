@@ -2,7 +2,7 @@ package memento.samples.bank.projector.adapter.persistence
 
 import memento.samples.bank.infra.Configuration
 import memento.samples.bank.infra.persistence.Utils
-import memento.samples.bank.projector.application.port.out.ProjectorPorts
+import memento.samples.bank.projector.application.port.ProjectorPorts
 import memento.samples.bank.projector.domain.Account
 import memento.samples.bank.projector.domain.Balance
 

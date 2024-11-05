@@ -1,7 +1,7 @@
 package memento.samples.cargo.command.delivery.adapter.rest
 
 import memento.samples.cargo.command.delivery.adapter.rest.payload.RequestPayload
-import memento.samples.cargo.command.delivery.application.port.in.UseCases
+import memento.samples.cargo.command.delivery.application.port.UseCases
 import io.micronaut.http.MediaType
 import io.micronaut.http.annotation.Body
 import io.micronaut.http.annotation.Controller

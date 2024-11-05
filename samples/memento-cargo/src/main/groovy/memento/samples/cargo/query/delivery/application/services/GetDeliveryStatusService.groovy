@@ -1,7 +1,7 @@
 package memento.samples.cargo.query.delivery.application.services
 
-import memento.samples.cargo.query.delivery.application.port.in.UseCases
-import memento.samples.cargo.query.delivery.application.port.out.DeliveryQueryPorts
+import memento.samples.cargo.query.delivery.application.port.UseCases
+import memento.samples.cargo.query.delivery.application.port.DeliveryQueryPorts
 import memento.samples.cargo.query.delivery.domain.Delivery
 
 import jakarta.inject.Inject

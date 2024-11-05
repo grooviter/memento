@@ -1,6 +1,6 @@
 package memento.samples.cargo.query.delivery.adapter.rest
 
-import memento.samples.cargo.query.delivery.application.port.in.UseCases
+import memento.samples.cargo.query.delivery.application.port.UseCases
 import memento.samples.cargo.query.delivery.domain.Delivery
 import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get

@@ -2,7 +2,7 @@ package memento.samples.bank.report.adapter.persistence
 
 import memento.samples.bank.infra.Configuration
 import memento.samples.bank.infra.persistence.Utils
-import memento.samples.bank.report.application.port.out.ReportPorts
+import memento.samples.bank.report.application.port.ReportPorts
 import memento.samples.bank.report.domain.Account
 import memento.samples.bank.report.domain.Balance
 

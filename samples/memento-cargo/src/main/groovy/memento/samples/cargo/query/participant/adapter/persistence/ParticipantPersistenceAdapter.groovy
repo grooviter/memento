@@ -1,7 +1,7 @@
 package memento.samples.cargo.query.participant.adapter.persistence
 
 
-import memento.samples.cargo.query.participant.application.port.out.ParticipantQueryPorts
+import memento.samples.cargo.query.participant.application.port.ParticipantQueryPorts
 import memento.samples.cargo.query.participant.domain.Participant
 
 import jakarta.inject.Inject
