@@ -10,7 +10,7 @@ and snapshots **as csv files**.
 [source, groovy]
 .save an aggregate
 ----
-@Grab('io.grooviter:memento-base:0.1.0')
+@Grab('io.grooviter:memento-csv:0.1.0')
 import io.grooviter.memento.*
 
 import static java.util.UUID.randomUUID

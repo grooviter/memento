@@ -1,4 +1,4 @@
-== Theory
+== Use cases
 
 [quote, , 'Event Sourcing definition at https://www.eventstore.com/blog/what-is-event-sourcing[eventstore.com]']
 Event Sourcing is an alternative way to persist data. In contrast with state-oriented persistence that only keeps

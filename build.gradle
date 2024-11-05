@@ -13,7 +13,7 @@ config {
     release = shouldRelease
 
     info {
-        name          = 'Mementox'
+        name          = 'Memento'
         vendor        = 'Grooviter'
         description   = 'Memento tries to provide a high level abstraction for different EventStore implementations'
         inceptionYear = '2021'

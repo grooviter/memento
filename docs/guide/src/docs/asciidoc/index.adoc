@@ -10,8 +10,6 @@ include::intro.adoc[]
 
 include::getting.adoc[]
 
-include::theory.adoc[]
-
 include::usage.adoc[]
 
 include::aggregate.adoc[]
@@ -20,8 +18,8 @@ include::event.adoc[]
 
 include::event_store.adoc[]
 
-include::csv.adoc[]
+include::use_cases.adoc[]
 
-include::micronaut.adoc[]
+include::implementations.adoc[]
 
 include::license.adoc[]

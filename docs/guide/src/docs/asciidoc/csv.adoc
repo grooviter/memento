@@ -1,6 +1,6 @@
-== CSV EventStore
+=== CSV
 
-=== Usage
+==== Usage
 
 .Gradle
 ```groovy
@@ -13,7 +13,7 @@ dependencies {
 }
 ```
 
-=== Example
+==== Example
 
 You can create a basic CSV backed EventStore by using the `memento-csv` module:
 

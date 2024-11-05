@@ -1,6 +1,6 @@
-== Micronaut Data
+=== Micronaut Data (jdbc)
 
-=== Usage
+==== Usage
 
 In order to use `memento-micronaut-jdbc` in your Gradle project:
 
