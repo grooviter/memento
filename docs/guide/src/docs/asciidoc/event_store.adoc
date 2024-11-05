@@ -59,6 +59,22 @@ interface EventBusPort {
 }
 ```
 
+Sometimes you may just one to check that events trigger event bus by using the Memento builder `onEvent(Consumer<Event>)`:
+
+.Basic CSV EventStore
+```groovy
+@Grab('io.grooviter.memento:memento-csv:$VERSION')
+import io.grooviter.memento.*
+
+EventStore eventStore = Memento.builder()
+    .csvStorage('/tmp/events.csv', '/tmp/snapshots.csv')
+    .snapshotThreshold(2)
+    .onEvent { event -> println("event: $event") } // <1>
+    .build()
+```
+
+<1> Every time a new event is persisted in the event store the `onEvent` method will be triggered
+
 === SERDE
 
 Because the payload of the event is JSON, we need to convert the event information to JSON and then re-create the
