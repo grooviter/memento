@@ -1,4 +1,4 @@
-package memento.csv.csv.model
+package memento.csv.model
 
 import memento.model.Aggregate
 

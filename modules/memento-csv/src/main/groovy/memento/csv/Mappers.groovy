@@ -1,4 +1,4 @@
-package memento.csv.csv
+package memento.csv
 
 import memento.EventSerdePort
 import memento.model.Aggregate

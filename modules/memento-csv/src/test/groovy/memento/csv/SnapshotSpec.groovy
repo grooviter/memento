@@ -1,9 +1,9 @@
-package memento.csv.csv
+package memento.csv
 
 import memento.EventStore
 import memento.Memento
-import memento.csv.csv.model.CartItem
-import memento.csv.csv.model.ShoppingCart
+import memento.csv.model.CartItem
+import memento.csv.model.ShoppingCart
 import memento.tck.Utils
 import memento.tck.fixtures.Fixtures
 import spock.lang.Specification
