@@ -1,11 +1,11 @@
 == Event
 
-An event in Memento is a class extending `io.grooviter.memento.Event` and it will be always be applied
+An event in Memento is a class extending `memento.Event` and it will be always be applied
 to a specific type of Aggregate:
 
 .Declaring Event
 ```groovy
-import io.grooviter.memento.Event
+import memento.Event
 
 class MyEvent extends Event<AggregateType> {
   // event properties here
@@ -18,7 +18,7 @@ domain related methods:
 
 .Declaring Event
 ```groovy
-import io.grooviter.memento.Event
+import memento.Event
 import groovy.transform.InheritConstructors
 
 class NameAdded extends Event<User> {

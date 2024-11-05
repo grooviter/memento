@@ -10,9 +10,9 @@ and snapshots **as csv files**.
 [source, groovy]
 .save an aggregate
 ----
-@Grab('io.grooviter:memento-csv:0.1.0')
-import io.grooviter.memento.*
-
+@Grab('com.github.grooviter:memento-csv:0.1.0')
+import memento.*
+import groovy.transform.*
 import static java.util.UUID.randomUUID
 
 // EVENTS... <1>
@@ -25,11 +25,12 @@ class Appended extends Event<Document> {
 }
 
 // AGGREGATE... <2>
+@InheritConstructors
 class Document extends Aggregate {
     String title, author, content = ''
 
     static Document create(String title, String author) {
-        return new Document(id: randomUUID()).apply(new Created(title: title, author: author))
+        return new Document(randomUUID()).apply(new Created(title: title, author: author))
     }
 
     Document append(String content) {
@@ -39,9 +40,10 @@ class Document extends Aggregate {
     // EVENT_CONFIGURATION... <3>
     @Override
     void configure() {
-        bind(Created) // applies all matching event properties to Aggregate
+        // applies all matching event properties to Aggregate
+        bind(Created)
+        // applies event to Aggregate as defined in closure
         bind(Appended) { Document doc, Appended event ->
-            // applies event to Aggregate as defined in closure
             doc.content += event.content
         }
     }

@@ -9,7 +9,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'io.grooviter:memento-csv:$VERSION'
+    implementation 'com.github.grooviter:memento-csv:$VERSION'
 }
 ```
 
@@ -19,8 +19,8 @@ You can create a basic CSV backed EventStore by using the `memento-csv` module:
 
 .Basic CSV EventStore
 ```groovy
-@Grab('io.grooviter.memento:memento-csv:$VERSION')
-import io.grooviter.memento.*
+@Grab('com.github.grooviter:memento-csv:$VERSION')
+import memento.*
 
 EventStore eventStore = Memento.builder()
     .csvStorage('/tmp/events.csv', '/tmp/snapshots.csv') // <1>

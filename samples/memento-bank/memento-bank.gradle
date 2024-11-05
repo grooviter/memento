@@ -13,7 +13,7 @@ micronaut {
     testRuntime("spock2")
     processing {
         incremental(true)
-        annotations("io.grooviter.memento.bookkeeper.*")
+        annotations("memento.samples.bank.*")
     }
 }
 

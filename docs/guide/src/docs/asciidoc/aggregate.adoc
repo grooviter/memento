@@ -1,6 +1,6 @@
 == Aggregate
 
-An aggregate in Memento is a class extending `io.grooviter.memento.Aggreggate`:
+An aggregate in Memento is a class extending `memento.Aggreggate`:
 
 .Aggregate
 ```groovy
@@ -17,7 +17,7 @@ do it is to create an static method:
 
 .Create Aggregate (static)
 ```groovy
-import io.grooviter.memento.*
+import memento.*
 
 class Delivery extends Aggregate {
     String clientId
@@ -32,7 +32,7 @@ or maybe via constructor:
 
 .Create Aggregate (Constructor)
 ```groovy
-import io.grooviter.memento.*
+import memento.*
 
 class Delivery extends Aggregate {
     String clientId
@@ -47,7 +47,7 @@ Of course we can short it with Groovy's `@InheritConstructors`:
 
 .Create Aggregate (@InheritConstructors)
 ```groovy
-import io.grooviter.memento.*
+import memento.*
 import groovy.transform.*
 
 @InheritConstructors()
@@ -82,7 +82,7 @@ trigger event versioning. The
 
 .Aggregate#apply
 ```groovy
-import io.grooviter.memento.*
+import memento.*
 
 class Requested extends Event<Delivery> {
     String clientId
@@ -114,7 +114,7 @@ These steps are pretty common that's why there's an alternative to avoid a littl
 
 .bind methods
 ```groovy
-import io.grooviter.memento.*
+import memento.*
 
 class Requested extends Event<Delivery> {
     String clientId

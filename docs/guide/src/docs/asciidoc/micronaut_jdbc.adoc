@@ -10,6 +10,6 @@ repositories {
 }
 
 dependencies {
-    implementation 'io.grooviter:memento-micronaut-jdbc:$VERSION'
+    implementation 'com.github.grooviter:memento-micronaut-jdbc:$VERSION'
 }
 ```

@@ -10,7 +10,7 @@ To create an `EventStore` in Memento you can use Memento builder:
 
 .EventStore
 ```groovy
-import io.grooviter.memento.*
+import memento.*
 
 EventStore eventStore = Memento.builder()
     .eventStorage(...) // <1>
@@ -46,12 +46,12 @@ Regarding that the event store is more used for reading than writing, there coul
 in knowing when a new event has been stored in the system. In order to be able to publish notifications the event store
 uses an event bus. An event bus is a system that delivers messages from message producers to message receivers.
 
-Any event bus added to Memento's event store builder should implement `io.grooviter.memento.EventBusPort`
+Any event bus added to Memento's event store builder should implement `memento.EventBusPort`
 
 ```groovy
-package io.grooviter.memento
+package memento
 
-import io.grooviter.memento.model.Event
+import memento.model.Event
 
 interface EventBusPort {
     void publish(Event event, EventSerdePort serdePort)
@@ -63,8 +63,8 @@ Sometimes you may just one to check that events trigger event bus by using the M
 
 .Basic CSV EventStore
 ```groovy
-@Grab('io.grooviter.memento:memento-csv:$VERSION')
-import io.grooviter.memento.*
+@Grab('com.github.grooviter:memento-csv:$VERSION')
+import memento.*
 
 EventStore eventStore = Memento.builder()
     .csvStorage('/tmp/events.csv', '/tmp/snapshots.csv')

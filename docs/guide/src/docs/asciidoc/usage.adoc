@@ -9,7 +9,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'io.grooviter:memento-csv:$VERSION'
+    implementation 'com.github.grooviter:memento-csv:$VERSION'
 }
 ```
 
@@ -17,8 +17,8 @@ Or as we mentioned in link:getting.adoc[the getting started section] use it in y
 
 .Groovy Script
 ```groovy
-@Grab('io.grooviter:memento-csv:$VERSION')
-import io.grooviter.memento.*
+@Grab('com.github.grooviter:memento-csv:$VERSION')
+import memento.*
 
 // your code here
 ```
