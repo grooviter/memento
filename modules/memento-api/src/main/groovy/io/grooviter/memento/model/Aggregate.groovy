@@ -54,6 +54,14 @@ class Aggregate {
     }
 
     /**
+     * @since 0.1.0
+     */
+    Aggregate(UUID id) {
+        this.id = id
+        this.configure()
+    }
+
+    /**
      * Applies basic properties to aggregate
      *
      * @param event an instance of type {@link Event}

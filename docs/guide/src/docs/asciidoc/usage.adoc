@@ -1,3 +1,22 @@
-== General Usage
+== Usage
 
-TODO
+In order to use Memento in your Gradle project:
+
+```groovy
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'io.grooviter:memento-base:$VERSION'
+}
+```
+
+Or as we mentioned in link:getting.adoc[the getting started section] use it in your Groovy scripts directly:
+
+```groovy
+@Grab('io.grooviter:memento-base:$VERSION')
+import io.grooviter.memento.*
+
+// your code here
+```

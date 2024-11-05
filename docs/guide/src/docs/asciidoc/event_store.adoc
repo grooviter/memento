@@ -1,0 +1,65 @@
+== EventStore
+
+In order to persist all the aggregate events we use an EventStore. A Memento `EventStore` instance is built on top of these three components:
+
+- **STORAGE**: were events and snapshots are going to be stored (database, csv...)
+- **EVENT-BUS**:: system to notify when events/snapshots are stored
+- **SERDE**: (serialization/deserialization) how to serialize/deserialize events to/from the storage
+
+To create an `EventStore` in Memento you can use Memento builder:
+
+.EventStore
+```groovy
+import io.grooviter.memento.*
+
+EventStore eventStore = Memento.builder()
+    .eventStorage(...) // <1>
+    .eventBus(...) // <2>
+    .serde(...) // <3>
+    .snapshotThreshold(2) // <4>
+    .build()
+```
+
+<1> Declares where the events are going to be stored, it could a database, a csv file...etc
+<2> Every time an event is applied to the aggregate the event could be send to an event bus if it's set
+<3> Events are serialized and deserialized from the underlying event storage. Classes responsible for the serialization
+are handled by a implementation of the serde.
+<4> We can customize how many events should be persisted before a new version of a snapshot is generated.
+
+=== Storage
+
+Basically where the events are going to be stored. That could be anything, a database, a csv file, queue systems. The
+only thing that matters is that the event information could be stored in such a way it could be later be used again
+to replay the state of the system.
+
+The event structure is:
+
+- ID
+- AGGREGATE ID
+- VERSION
+- JSON
+- DATE
+
+=== Event Bus
+
+Regarding that the event store is more used for reading than writing, there could be many systems that are interested
+in knowing when a new event has been stored in the system. In order to be able to publish notifications the event store
+uses an event bus. An event bus is a system that delivers messages from message producers to message receivers.
+
+Any event bus added to Memento's event store builder should implement `io.grooviter.memento.EventBusPort`
+
+```groovy
+package io.grooviter.memento
+
+import io.grooviter.memento.model.Event
+
+interface EventBusPort {
+    void publish(Event event, EventSerdePort serdePort)
+    void publishAsync(Event event, EventSerdePort serdePort)
+}
+```
+
+=== SERDE
+
+Because the payload of the event is JSON, we need to convert the event information to JSON and then re-create the
+object from that JSON. Serde is an acronym for **SER**ialization/**DE**serialization.

@@ -1,0 +1,54 @@
+== Theory
+
+[quote, , 'Event Sourcing definition at https://www.eventstore.com/blog/what-is-event-sourcing[eventstore.com]']
+Event Sourcing is an alternative way to persist data. In contrast with state-oriented persistence that only keeps
+the latest version of the entity state, Event Sourcing stores each state mutation as a separate record called an event.
+
+**Every change is registered in an event log** so that we can keep an audit trail. For instance imagine we'd like to
+keep track of our bank account deposits and withdrawals:
+
+image::ledger.png[alt="Ledger", align="center", width="75%"]
+
+We're using our account id (AID), a version number to denote the order of events happening, the type of event, the value
+deposited or withdraw and finally when the event happened. Storing data this way enables among other things:
+
+- **HISTORICAL REVIEW**: we can **re-create the state of our account at any given point in time**
+- **HETEROGENEOUS USES OF THE DATA**: we can create **different views of the data** depending on our requirements
+
+=== Historical Review
+
+Marting Fowler https://martinfowler.com/eaaDev/EventSourcing.html[highlights historical review features]
+of event sourcing:
+
+- **COMPLETE REBUILD**: rebuild the application state from the event log
+- **TEMPORAL QUERY**: determine the application state in a given moment in time
+- **EVENT REPLAY**: the possibility to compute consequences of past events and maybe replay those events differently
+
+Following our bank account example, I may want to know why my balance is at a given state, and the bank must be able
+to show every event until the current state so that there's no doubt about the current balance.
+If the bank stored only the last state that information would be lost forever. However because we've stored every
+event we can answer that question:
+
+image::temporal_query.png[alt="Temporal Query", align="center", width="70%"]
+
+=== Heterogeneous Uses
+
+Another use case is **when the data the system is producing is being consumed in different ways by different systems**.
+
+For example, in an e-commerce application, different departments could be interested in different views of the data,
+accounting might be interested in sales whereas marketing could be interested in user fidelity. In such systems there
+are always more reads than writes.
+
+An architectural pattern applied to this use case is **CQRS** (**C**ommand/**Q**uery **R**esponsibility **S**egregation).
+This pattern uses the idea of using a different model for create information than the model used for reading information.
+
+An **event log** could be used in this context to be **the single source of truth** of the system.
+From there any reading system could read from the event store and then create their own views to serve to their clients.
+
+image::different_reads.png[alt="Heterogeneous reads", align="center", width="70%"]
+
+=== Resources
+
+- https://martinfowler.com/eaaDev/EventSourcing.html[Martin Fowler on Event Sourcing]
+- https://martinfowler.com/bliki/CQRS.html[Martin Fowler on CQRS]
+- https://www.eventstore.com/blog/what-is-event-sourcing[EventStore database article on Event Sourcing]

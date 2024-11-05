@@ -1,0 +1,36 @@
+== CSV EventStore
+
+=== Usage
+
+.Gradle
+```groovy
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'io.grooviter:memento-csv:$VERSION'
+}
+```
+
+=== Example
+
+You can create a basic CSV backed EventStore by using the `memento-csv` module:
+
+.Basic CSV EventStore
+```groovy
+@Grab('io.grooviter.memento:memento-csv:$VERSION')
+import io.grooviter.memento.*
+
+EventStore eventStore = Memento.builder()
+    .csvStorage('/tmp/events.csv', '/tmp/snapshots.csv') // <1>
+    .snapshotThreshold(2) // <2>
+    .build()
+```
+
+This creates a new `EventStore` persisting both events and snapshots in csv files:
+
+<1> declares files where events and snapshots will be persisted (events.csv and snapshots.csv)
+<2> stores a new snapshot every 2 events
+
+Event is stored as a new line in the csv file, and the event payload will be serialized as JSON

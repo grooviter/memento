@@ -1,0 +1,180 @@
+== Aggregate
+
+An aggregate in Memento is a class extending `io.grooviter.memento.Aggreggate`:
+
+```groovy
+class MyAggregate extends Aggregate {
+  String clientId
+}
+```
+
+=== Creating
+
+Before applying any event to the aggregate, we need to create an instance of it. The only attribute required up front
+is an id. All events applied to that aggregate will be related to it via the aggregate id. For example, a possible way to
+do it is to create an static method:
+
+```groovy
+import io.grooviter.memento.*
+
+class Delivery extends Aggregate {
+    String clientId
+
+    static Delivery create() {
+        return new Delivery(UUID.randomUUID())
+    }
+}
+```
+
+or maybe via constructor:
+
+```groovy
+import io.grooviter.memento.*
+
+class Delivery extends Aggregate {
+    String clientId
+
+    Delivery(UUID id) {
+       super(id)
+    }
+}
+```
+
+Of course we can short it with Groovy's `@InheritConstructors`:
+
+```groovy
+import io.grooviter.memento.*
+import groovy.transform.*
+
+@InheritConstructors()
+class Delivery extends Aggregate {
+    String clientId
+}
+```
+
+=== Adding events
+
+Once we've got an aggregate instance we can add events to it. An aggregate represents a domain context where a set of
+events will be applied. For example, imagine an events over the aggregate `Delivery` such as:
+
+- requested: a client has bought something and has triggered a new delivery
+- received: once the purchase arrives to the client's address the delivery received event is applied
+
+The aggregate model could be modelled as:
+
+```groovy
+@InheritConstructors
+class Delivery extends Aggregate {
+   ...
+   Delivery requested(String clientId){}
+   Delivery received(LocalDateTime when, String byWhomId) {}
+   ...
+}
+```
+
+These methods can be of any shape, the idea is to use the inherited method `Aggregate#apply(event)` to
+trigger event versioning. The
+
+```groovy
+import io.grooviter.memento.*
+
+class Requested extends Event<Delivery> {
+    String clientId
+}
+
+@InheritConstructors
+class Delivery extends Aggregate {
+    String clientId
+
+    Delivery requested(String clientId) {
+       return this.apply(new Requested(clientId: clientId)
+    }
+
+    private Delivery apply(Requested requested) {
+        super.apply(requested) // <1>
+        this.clientId = requested.clientId // <2>
+        return this // <3>
+    }
+}
+```
+
+<1> Triggers event versioning
+<2> Changes aggregate state
+<3> returns current aggregate in case we'd like to keep chaining methods
+
+These steps are pretty common that's why there's an alternative to avoid a little bit the boilerplate code:
+
+```groovy
+import io.grooviter.memento.*
+
+class Requested extends Event<Delivery> {
+    String clientId
+}
+
+@InheritConstructors
+class Delivery extends Aggregate {
+    String clientId
+
+    Delivery requested(String clientId) {
+       return this.apply(new Requested(clientId: clientId)
+    }
+
+    @Override
+    void configure() { // <1>
+        bind(Requested)  // <2>
+    }
+}
+```
+
+<1> The `Aggregate` class has a hook method `Aggregate#configure()` that should be used to register the functions telling the
+aggregate how to process incoming events
+<2> In order to avoid boilerplate code, the `Aggregate#bind(...)` methods. `Aggregate#bind(Class<Event)` copies the
+properties matching the aggregate
+
+In this example both `Delivery` and `Requested` classes have a field named `clientId`. So by using:
+
+```groovy
+bind(Requested)
+```
+
+Every time the `Requested` event is applied to the `Delivery` instance it will copy the value from `Requested#clientId` to
+`Delivery#clientId`.
+
+There's another method `Aggregate#bind(Event, Closure)` when the logic is more complex.
+
+```groovy
+bind(Requested) { Delivery delivery, Requested event ->
+    delivery.clientId = event.clientId
+}
+```
+
+The Closure params are the Aggregate type the event is going to be applied to, and the event type is going to be applied.
+In order to resolve
+
+[sidebar]
+.Event<Aggregate> should match Aggregate
+****
+
+When using the `bind(EventType, Closure)` method:
+
+.bind
+```groovy
+bind(EventType) { AggregateType agg, EventType event ->
+ // logic here
+}
+```
+
+We should make sure that all events generic argument matches the aggregate they are going to be applied to in
+their type signature:
+
+.Use aggregate in event generics
+```groovy
+// class EventType extends Event<AggregateType> {}
+class Requested extends Event<Delivery> {}
+class Received extends Event<Delivery> {}
+class Loaded extends Event<Delivery> {}
+
+// class AggregateType extends Aggregate {}
+class Delivery extends Aggregate {}
+```
+****

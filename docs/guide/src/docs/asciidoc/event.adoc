@@ -1,0 +1,61 @@
+== Event
+
+An event in Memento is a class extending `io.grooviter.memento.Event` and it will be always be applied
+to a specific type of Aggregate:
+
+.Declaring Event
+```groovy
+import io.grooviter.memento.Event
+
+class MyEvent extends Event<AggregateType> {
+  // event properties here
+}
+```
+
+The event then can be applied to the aggregate it belongs to. The events will be integrated in the aggregate
+by using the `Aggregate#apply(event)` method. Although this method can be used directly, normally we can create
+domain related methods:
+
+.Declaring Event
+```groovy
+import io.grooviter.memento.Event
+import groovy.transform.InheritConstructors
+
+class NameAdded extends Event<User> {
+    String name
+}
+
+class AddressAdded extends Event<User> {
+    String address
+}
+
+@InheritConstructors
+class User extends Aggregate {
+    String name, address
+
+    static User create(String name) {
+        return new User(UUID.randomUUID).apply(new NameAdded(name)
+    }
+
+    User mainAddress(String address) {
+        return this.apply(new AddressAdded(address))
+    }
+
+    @Override
+    void configure() {
+        bind(NameAdded, AddressAdded)
+    }
+}
+```
+
+And then we can use a fluid method chaining if we want to:
+
+.fluid method chaining
+```groovy
+User aggregate = User
+    .create("John")
+    .mainAddress("42 First Avenue")
+```
+
+Once we have our aggregate populated we may need to persist all the events in some event store. This is explained in the
+next section.

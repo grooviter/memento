@@ -4,17 +4,24 @@
 :imagesDir: images/
 :baseDir: .
 :stem:
-
-[sidebar]
-.Apache 2.0
-****
-*Memento* is an open source project and its licensed under the http://www.apache.org/licenses/LICENSE-2.0.html[Apache 2 License].
-****
+:toclevels: 4
 
 include::intro.adoc[]
 
 include::getting.adoc[]
 
+include::theory.adoc[]
+
 include::usage.adoc[]
 
+include::aggregate.adoc[]
+
+include::event.adoc[]
+
+include::event_store.adoc[]
+
+include::csv.adoc[]
+
 include::micronaut.adoc[]
+
+include::license.adoc[]

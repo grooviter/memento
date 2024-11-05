@@ -1,9 +1,10 @@
 == Getting started
 
-The following example presents a **Document** aggregate, the Document can support different types of events such as **creating a document** (Created)
-or **appending text** to the document (Appended).
+The following example presents a **Document** aggregate:
 
-Also an **EventStore** implementation is created to store the aggregate events. This particular implementation stores events
+- The Document can support different types of events such as **creating a document** (Created)
+or **appending text** to the document (Appended).
+- Also an **EventStore** implementation is created to store the aggregate events. This particular implementation stores events
 and snapshots **as csv files**.
 
 [source, groovy]
@@ -14,7 +15,7 @@ import io.grooviter.memento.*
 
 import static java.util.UUID.randomUUID
 
-// EVENTS...
+// EVENTS... <1>
 class Created extends Event<Document> {
     String title, author
 }
@@ -23,7 +24,7 @@ class Appended extends Event<Document> {
     String content
 }
 
-// AGGREGATE...
+// AGGREGATE... <2>
 class Document extends Aggregate {
     String title, author, content = ''
 
@@ -35,35 +36,43 @@ class Document extends Aggregate {
         return this.apply(new Appended(content: content))
     }
 
-    // EVENT_CONFIGURATION...
+    // EVENT_CONFIGURATION... <3>
     @Override
     void configure() {
-        // bind(Class<Event>) applies event properties to Aggregate
-        bind(Created)
-
-        // bind(Class<Event>, Closure) applies event to Aggregate as defined in closure
+        bind(Created) // applies all matching event properties to Aggregate
         bind(Appended) { Document doc, Appended event ->
+            // applies event to Aggregate as defined in closure
             doc.content += event.content
         }
     }
 }
 
-// EVENTSTORE IMPLEMENTATION...
+// EVENTSTORE IMPLEMENTATION... <4>
 EventStore eventStore = Memento.builder()
     .csvEventStorage('/tmp/events.csv', '/tmp/snapshots.csv')
     .snapshotThreshold(2) // snapshot every 2 events
     .build()
 
-// CREATING AND STORING AN AGGREGATE....
+// CREATING AND STORING AN AGGREGATE.... <5>
 Document document = Document.create("Memento", "Christopher Nolan")
     .append("A man who, as a result of an injury,")
     .append(", has anterograde amnesia")
     .append("and has short-term memory loss")
     .append("approximately every fifteen minutes.")
 
-// SAVING THE AGGREGATE's EVENTS...
+// SAVING THE AGGREGATE's EVENTS... <6>
 eventStore.save(document)
 ----
+
+<1> The events used should extend the Event interface and have as generic value the class of the Aggregate
+<2> We can create methods in our Aggregate to make it easier to work with it
+<3> Configuring how the aggregate is going to apply the events. The `void configure() {}` method is a hook in the aggregate used to register how
+events are going to be applied to the aggregate. There are some built-in `bind(...)`
+functions to avoid creating boilerplate code.
+<4> Configuring Memento engine responsible for storing aggregate events and snapshots. By default we are using csv files
+to store both events and snapshots. Creating snapshots every two events.
+<5> Creating an aggregate and adding events to it
+<6> Storing the aggregate state to the configured memento engine.
 
 If you take a look at the **events.csv** file you will see the following.
 

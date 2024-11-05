@@ -1,3 +1,15 @@
 == Micronaut Data
 
-TODO
+=== Usage
+
+In order to use `memento-micronaut-jdbc` in your Gradle project:
+
+```groovy
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'io.grooviter:memento-micronaut-jdbc:$VERSION'
+}
+```
