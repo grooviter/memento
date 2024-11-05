@@ -2,6 +2,7 @@
 
 In order to use Memento in your Gradle project:
 
+.Gradle
 ```groovy
 repositories {
     mavenCentral()
@@ -14,6 +15,7 @@ dependencies {
 
 Or as we mentioned in link:getting.adoc[the getting started section] use it in your Groovy scripts directly:
 
+.Groovy Script
 ```groovy
 @Grab('io.grooviter:memento-base:$VERSION')
 import io.grooviter.memento.*

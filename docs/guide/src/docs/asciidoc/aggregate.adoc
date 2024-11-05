@@ -2,6 +2,7 @@
 
 An aggregate in Memento is a class extending `io.grooviter.memento.Aggreggate`:
 
+.Aggregate
 ```groovy
 class MyAggregate extends Aggregate {
   String clientId
@@ -14,6 +15,7 @@ Before applying any event to the aggregate, we need to create an instance of it.
 is an id. All events applied to that aggregate will be related to it via the aggregate id. For example, a possible way to
 do it is to create an static method:
 
+.Create Aggregate (static)
 ```groovy
 import io.grooviter.memento.*
 
@@ -28,6 +30,7 @@ class Delivery extends Aggregate {
 
 or maybe via constructor:
 
+.Create Aggregate (Constructor)
 ```groovy
 import io.grooviter.memento.*
 
@@ -42,6 +45,7 @@ class Delivery extends Aggregate {
 
 Of course we can short it with Groovy's `@InheritConstructors`:
 
+.Create Aggregate (@InheritConstructors)
 ```groovy
 import io.grooviter.memento.*
 import groovy.transform.*
@@ -62,6 +66,7 @@ events will be applied. For example, imagine an events over the aggregate `Deliv
 
 The aggregate model could be modelled as:
 
+.Adding events
 ```groovy
 @InheritConstructors
 class Delivery extends Aggregate {
@@ -75,6 +80,7 @@ class Delivery extends Aggregate {
 These methods can be of any shape, the idea is to use the inherited method `Aggregate#apply(event)` to
 trigger event versioning. The
 
+.Aggregate#apply
 ```groovy
 import io.grooviter.memento.*
 
@@ -102,8 +108,11 @@ class Delivery extends Aggregate {
 <2> Changes aggregate state
 <3> returns current aggregate in case we'd like to keep chaining methods
 
+=== bind methods
+
 These steps are pretty common that's why there's an alternative to avoid a little bit the boilerplate code:
 
+.bind methods
 ```groovy
 import io.grooviter.memento.*
 
@@ -133,6 +142,7 @@ properties matching the aggregate
 
 In this example both `Delivery` and `Requested` classes have a field named `clientId`. So by using:
 
+.bind(Event)
 ```groovy
 bind(Requested)
 ```
@@ -140,8 +150,16 @@ bind(Requested)
 Every time the `Requested` event is applied to the `Delivery` instance it will copy the value from `Requested#clientId` to
 `Delivery#clientId`.
 
+There's a variant of this method that allows to handle an array of event types to be applied:
+
+.bind(Event...)
+```groovy
+bind(Requested, Received...)
+```
+
 There's another method `Aggregate#bind(Event, Closure)` when the logic is more complex.
 
+.bind(Event, Closure)
 ```groovy
 bind(Requested) { Delivery delivery, Requested event ->
     delivery.clientId = event.clientId

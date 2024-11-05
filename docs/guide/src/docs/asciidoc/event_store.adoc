@@ -75,7 +75,7 @@ EventStore eventStore = Memento.builder()
 
 <1> Every time a new event is persisted in the event store the `onEvent` method will be triggered
 
-=== SERDE
+=== Serde
 
 Because the payload of the event is JSON, we need to convert the event information to JSON and then re-create the
 object from that JSON. Serde is an acronym for **SER**ialization/**DE**serialization.
