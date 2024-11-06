@@ -8,8 +8,6 @@ ext {
     mavenUsername   = findProperty("PUBLISH_REPO_USERNAME")
     mavenPassword   = findProperty("PUBLISH_REPO_PASSWORD")
     shouldRelease   = !"$version".endsWith('SNAPSHOT')
-    prereleaseTasks = ['publishAllPublicationsToSnapshotsRepository']
-    releaseTasks    = ['publishAllPublicationsToReleasesRepository', ':guide:gitPublishPush', 'jreleaserFullRelease']
 }
 
 config {
@@ -166,8 +164,4 @@ allprojects {
             force "org.codehaus.groovy:groovy:$groovy"
         }
     }
-}
-
-task release() {
-    dependsOn(version.endsWith('SNAPSHOT') ? prereleaseTasks : releaseTasks)
 }
