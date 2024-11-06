@@ -1,4 +1,5 @@
 == EventStore
+:guide-src: ../../../../../samples/memento-guide/src/test/groovy/memento/guide
 
 In order to persist all the aggregate events we use an EventStore. A Memento `EventStore` instance is built on top of these three components:
 
@@ -26,6 +27,26 @@ EventStore eventStore = Memento.builder()
 are handled by a implementation of the serde.
 <4> We can customize how many events should be persisted before a new version of a snapshot is generated.
 
+For example, you can start storing your events with a CSV based event store `CsvEventStorage` and serializing
+events with Jackson JSON library:
+
+.CSV EventStore
+```groovy
+import memento.*
+
+include::{guide-src}/eventstore/EventStoreSpec.groovy[tag=csvstorage,indent=0]
+```
+
+Because every module in Memento provides new extension methods to the Memento builder instance, you can re-write the
+previous example as the following:
+
+.CSV EventStore (extension methods)
+```groovy
+import memento.*
+
+include::{guide-src}/eventstore/EventStoreSpec.groovy[tag=csvstoragewithextensions,indent=0]
+```
+
 === Storage
 
 Basically where the events are going to be stored. That could be anything, a database, a csv file, queue systems. The
@@ -34,11 +55,28 @@ to replay the state of the system.
 
 The event structure is:
 
-- ID
-- AGGREGATE ID
-- VERSION
-- JSON
-- DATE
+- **ID**: id of the event
+- **AGGREGATE ID**: the id of the aggregate id the event belongs to
+- **VERSION**: version of the aggregate
+- **JSON**: the event payload
+- **DATE**: when the event happened
+
+Memento has a default CSF file storage. You can persist events by using CSV storage:
+
+.CSV Store
+```groovy
+import memento.*
+
+include::{guide-src}/eventstore/EventStoreSpec.groovy[tag=csvstorage,indent=0]
+```
+
+The `eventsFile` and `snapshotsFile` could be either a String with the path of the files, or instances of type `File`.
+You can check more in the link:#_csv[implementations CSV section].
+
+Apart from using CSV file there is another implementation using a database via the `memento-micronaut-jdbc` module. This
+module persist events in a database
+using link:https://micronaut-projects.github.io/micronaut-data/4.9.3/guide/#dbc[Micronaut Data (JDBC)]. More information
+on this event storage implementation in section link:#_micronaut_data_jdbc[implementations Micronaut Data (jdbc)]
 
 === Event Bus
 
@@ -79,3 +117,58 @@ EventStore eventStore = Memento.builder()
 
 Because the payload of the event is JSON, we need to convert the event information to JSON and then re-create the
 object from that JSON. Serde is an acronym for **SER**ialization/**DE**serialization.
+
+==== Jackson
+
+Memento provides a default SERDE mechanism using the Jackson JSON library. By default when persisting an event the
+qualified name of the class is persisted. For example:
+
+.Default
+```groovy
+include::{guide-src}/eventstore/EventStoreSpec.groovy[tag=csvstoragewithextensions,indent=0]
+```
+
+When saving an aggregate instance, the persisted events will result in something like this:
+
+.Default output (CSV)
+```shell
+59e93fbb-...|9cbf9152-...|1|memento.guide.eventstore.events.TicketOpened|{"id":"..."}|"2024-11-05T18:48"
+```
+
+But you can create aliases in order to make the resulting JSON nicer:
+
+.Mappings
+```groovy
+include::{guide-src}/eventstore/EventStoreSpec.groovy[tag=custom_mappings,indent=0]
+```
+
+And then apply them to the serialization process.
+
+.EventStore
+```groovy
+include::{guide-src}/eventstore/EventStoreSpec.groovy[tag=event_store_with_mappings,indent=0]
+```
+
+The persisted events will result in something like this:
+
+.Mappings output (CSV)
+```shell
+59e93fbb-...|9cbf9152-...|1|TICKET_OPENED|{"id":"..."}|"2024-11-05T18:48"
+```
+
+==== Custom Serde
+
+You can provide your own serde mechanism by implementing the `memento.EventSerdePort` and pass it to
+memento event store builder `serde(EventSerdePort)`:
+
+.Custom serde implementation
+```groovy
+class YourImplementationSerde implements EventSerdePort {
+    ...
+}
+
+EventStore eventStore = Memento.builder()
+    .csvStorage('/tmp/events.csv', '/tmp/snapshots.csv')
+    .serde(new YourImplementationSerde())
+    .build()
+```

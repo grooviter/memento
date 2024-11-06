@@ -11,6 +11,7 @@ dependencies {
     // Memento
     api project(':memento-csv')
     implementation("org.apache.groovy:groovy:$groovy")
+    implementation("org.apache.groovy:groovy-contracts:$groovy")
     implementation("org.apache.groovy:groovy-json:$groovy")
     testImplementation("org.spockframework:spock-core:$spockframework")
     testImplementation("org.spockframework:spock-junit4:$spockframework")

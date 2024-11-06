@@ -54,8 +54,8 @@ class JacksonEventSerde implements EventSerdePort {
     @Override
     Aggregate aggregateFromJSON(String alias, String json) {
         Class clazz = this.mappings.resolveClass(alias)
-        JacksonEventSerde.log.debug("clazz for $alias is ${clazz.simpleName}")
-        return this.mapper.readValue(json, clazz)
+        log.debug("clazz for $alias is ${clazz.simpleName}")
+        return this.mapper.readValue(json, clazz) as Aggregate
     }
 
     @Override
@@ -66,7 +66,7 @@ class JacksonEventSerde implements EventSerdePort {
     @Override
     String resolveAlias(Class clazz) {
         String alias = this.mappings.resolveAlias(clazz)
-        JacksonEventSerde.log.debug("alias for ${clazz.simpleName} is $alias")
+        log.debug("alias for ${clazz.simpleName} is $alias")
         return alias
     }
 }
