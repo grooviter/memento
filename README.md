@@ -4,20 +4,35 @@
 
 ## What is Memento ?
 
-Memento is a simple EventStore implementation. Out of the box Memento supports storing events ands napshots
+Memento is a simple EventStore abstraction. Out of the box Memento supports storing events ands napshots
 in memory or csv files. It has a simple structure suitable for creating new backend implementations.
 
 ## Gradle
 
 To use `Memento` in your Gradle project you can add Maven Central repository:
 
-    repositories {
-        mavenCentral()
-    }
+```groovy
+repositories {
+    mavenCentral()
+}
+```
 
 Then add the base dependency to your project:
 
-    compile 'io.grooviter:memento-base:0.1.0-SNAPSHOT'
+```groovy
+compile 'com.github.grooviter:memento-csv:0.1.0-SNAPSHOT'
+```
+
+## Grab
+
+To use memento in your Groovy scripts you can use the `@Grab` annotation:
+```groovy
+@Grab('com.github.grooviter:memento-csv:0.1.0')
+import memento.*
+import memento.model.*
+
+//...
+```
 
 ## Documentation
 

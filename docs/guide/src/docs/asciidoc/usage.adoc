@@ -9,7 +9,14 @@ repositories {
 }
 
 dependencies {
+    // ONLY if you'd like to implement your own event store
+    implementation 'com.github.grooviter:memento-base:$VERSION'
+
+    // ONLY if you'd like to store events in CSV files
     implementation 'com.github.grooviter:memento-csv:$VERSION'
+
+    // ONLY if you'd planning to use Micronaut's data JDBC as event storage
+    implementation 'com.github.grooviter:memento-micronaut-jdbc:$VERSIONf'
 }
 ```
 
@@ -18,6 +25,8 @@ Or as we mentioned in link:getting.adoc[the getting started section] use it in y
 .Groovy Script
 ```groovy
 @Grab('com.github.grooviter:memento-csv:$VERSION')
+// @Grab('com.github.grooviter:memento-base:$VERSION')
+// @Grab('com.github.grooviter:memento-micronaut-jdbc:$VERSION')
 import memento.*
 
 // your code here

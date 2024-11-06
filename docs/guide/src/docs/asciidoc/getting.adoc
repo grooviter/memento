@@ -1,4 +1,5 @@
 == Getting started
+:guide-src: ../../../../../samples/memento-guide/src/test/groovy/memento/guide
 
 The following example presents a **Document** aggregate:
 
@@ -11,68 +12,20 @@ and snapshots **as csv files**.
 .save an aggregate
 ----
 @Grab('com.github.grooviter:memento-csv:0.1.0')
-import memento.*
-import groovy.transform.*
-import static java.util.UUID.randomUUID
-
-// EVENTS... <1>
-class Created extends Event<Document> {
-    String title, author
-}
-
-class Appended extends Event<Document> {
-    String content
-}
-
-// AGGREGATE... <2>
-@InheritConstructors
-class Document extends Aggregate {
-    String title, author, content = ''
-
-    static Document create(String title, String author) {
-        return new Document(randomUUID()).apply(new Created(title: title, author: author))
-    }
-
-    Document append(String content) {
-        return this.apply(new Appended(content: content))
-    }
-
-    // EVENT_CONFIGURATION... <3>
-    @Override
-    void configure() {
-        // applies all matching event properties to Aggregate
-        bind(Created)
-        // applies event to Aggregate as defined in closure
-        bind(Appended) { Document doc, Appended event ->
-            doc.content += event.content
-        }
-    }
-}
-
-// EVENTSTORE IMPLEMENTATION... <4>
-EventStore eventStore = Memento.builder()
-    .csvEventStorage('/tmp/events.csv', '/tmp/snapshots.csv')
-    .snapshotThreshold(2) // snapshot every 2 events
-    .build()
-
-// CREATING AND STORING AN AGGREGATE.... <5>
-Document document = Document.create("Memento", "Christopher Nolan")
-    .append("A man who, as a result of an injury,")
-    .append(", has anterograde amnesia")
-    .append("and has short-term memory loss")
-    .append("approximately every fifteen minutes.")
-
-// SAVING THE AGGREGATE's EVENTS... <6>
-eventStore.save(document)
+include::{guide-src}/GettingStartedSpec.groovy[tag=getting_started_script,indent=0]
 ----
 
 <1> The events used should extend the Event interface and have as generic value the class of the Aggregate
-<2> We can create methods in our Aggregate to make it easier to work with it
+<2> Creating an aggregate. Check the link:#_aggregate[Aggregate section to know more]
 <3> Configuring how the aggregate is going to apply the events. The `void configure() {}` method is a hook in the aggregate used to register how
 events are going to be applied to the aggregate. There are some built-in `bind(...)`
-functions to avoid creating boilerplate code.
-<4> Configuring Memento engine responsible for storing aggregate events and snapshots. By default we are using csv files
-to store both events and snapshots. Creating snapshots every two events.
+functions to avoid creating boilerplate code. For example if `Created` has a `title` property, the `bind(class)` method
+when applying the `Created` event to the `Document` aggregate, it will set the aggregate `title` property with
+the `Created` event `title` property.
+<4> Configuring Memento engine responsible for storing aggregate events and snapshots. Is always mandatory to configure
+at least the **storage, serialization and event bus** you're going to use. By default we are using a csv file storage to
+store both events and snapshots. Creating snapshots every two events. And the even bus we've configured is just
+printing out the events inserted in the event store.
 <5> Creating an aggregate and adding events to it
 <6> Storing the aggregate state to the configured memento engine.
 

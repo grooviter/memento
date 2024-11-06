@@ -1,113 +1,68 @@
 package memento.guide
 
-import memento.EventStore
-import memento.Memento
-import memento.model.Mappings
-import org.junit.Rule
-import org.junit.rules.TemporaryFolder
+import groovy.test.GroovyAssert
 import spock.lang.Specification
 
 class GettingStartedSpec extends Specification {
 
-    @Rule
-    TemporaryFolder temporaryFolder
-
-    // tag::jacksonmappings[]
-    static final MAPPINGS = Mappings.builder()
-        .addMapping("DOC_CREATED", Document.Created)
-        .addMapping("DOC_APPENDED", Document.Appended)
-        .addMapping("DOCUMENT", Document)
-        .build()
-    // end::jacksonmappings[]
-
-    void 'store events in csv file'() {
+    void 'getting started script'() {
         setup: 'csv files to store information'
-        File eventsFile = temporaryFolder.newFile()
-        File snapshotsFile = temporaryFolder.newFile()
+        def script = '''
+        // tag::getting_started_script[]
+        import memento.*
+        import memento.model.*
+        import groovy.transform.*
+        import static java.util.UUID.randomUUID
+        
+        // EVENTS... <1>
+        @TupleConstructor
+        class Created extends Event<Document> {
+            String title, author
+        }
 
-        and: 'an event store implementation'
-        // tag::defaulteventstore[]
+        @TupleConstructor        
+        class Appended extends Event<Document> {
+            String content
+        }
+        
+        // AGGREGATE... <2>
+        @InheritConstructors
+        class Document extends Aggregate {
+            String title, author, content = \'\'
+            // EVENT_CONFIGURATION... <3>
+            @Override
+            void configure() {
+                // applies all matching event properties to Aggregate
+                bind(Created)
+                // applies event to Aggregate as defined in closure
+                bind(Appended) { Document doc, Appended event ->
+                    doc.content += event.content
+                }
+            }
+        }
+        
+        // EVENTSTORE IMPLEMENTATION... <4>
         EventStore eventStore = Memento.builder()
-                .csvStorage(eventsFile, snapshotsFile)
-                .jacksonSerde()
-                .onEvent { println(it) }
-                .build()
-        // end::defaulteventstore[]
-
-        and: 'a given document'
-        // tag::insertevents[]
-        Document document = Document.create("My Book", "Peter Me")
-                .append("This is the story of ")
-                .append("someone")
-        // end::insertevents[]
-
-        when: 'saving the aggregate'
-        // tag::saveaggregate[]
-        eventStore.save(document)
-        // end::saveaggregate[]
-
-        and: 'recreate document'
-        Document loaded = eventStore.load(document.id, Document).get()
-
-        then: 'we should get that only one event happened'
-        loaded.version          == 3
-
-        and: 'no events to apply'
-        loaded.eventList.size() == 0
-
-        and: 'the loaded aggregate should have the expected data'
-        loaded.id
-        loaded.title   == 'My Book'
-        loaded.author  == 'Peter Me'
-        loaded.content == 'This is the story of someone'
-
-        and: 'the number of stored events are the expected'
-        eventsFile.readLines().size() == 3
-
-        cleanup:
-        println(eventsFile.text)
-    }
-
-    void 'store events in csv file with custom mappings'() {
-        given: 'csv files to store information'
-        File eventsFile = temporaryFolder.newFile()
-        File snapshotsFile = temporaryFolder.newFile()
-
-        and: 'an event store implementation'
-        // tag::jacksoneventstore[]
-        EventStore eventStore = Memento.builder()
-            .csvStorage(eventsFile, snapshotsFile)
-            .jacksonSerde(MAPPINGS)
-            .onEvent(event -> println("broadcasted-event: ${event.class.simpleName}"))
+            .csvStorage('/tmp/events.csv', '/tmp/snapshots.csv')  // STORAGE
+            .jacksonSerde()                                       // SERDE
+            .snapshotThreshold(2) // snapshot every 2 events
+            .onEvent(Object::println)                             // EVENTBUS
             .build()
-        // end::jacksoneventstore[]
-        and: 'a given document'
-        Document document = Document.create("My Book", "Peter Me")
-            .append("This is the story of ")
-            .append("someone")
-
-        when: 'saving the aggregate'
+        
+        // CREATING AND STORING AN AGGREGATE.... <5>
+        Document document = new Document(UUID.randomUUID())
+            .apply(new Created("Memento", "Christopher Nolan")
+            .apply(new Appended("A man who, as a result of an injury,"))
+            .apply(new Appended(", has anterograde amnesia"))
+            .apply(new Appended("and has short-term memory loss"))
+            .apply(new Appended("approximately every fifteen minutes."))
+        
+        // SAVING THE AGGREGATE's EVENTS... <6>
         eventStore.save(document)
+        // end::getting_started_script[]
+        '''
 
-        and: 'recreate document'
-        Document loaded = eventStore.load(document.id, Document).get()
-
-        then: 'we should get that only one event happened'
-        loaded.version          == 3
-
-        and: 'no events to apply'
-        loaded.eventList.size() == 0
-
-        and: 'the loaded aggregate should have the expected data'
-        loaded.id
-        loaded.title   == 'My Book'
-        loaded.author  == 'Peter Me'
-        loaded.content == 'This is the story of someone'
-
-        and: 'the number of stored events are the expected'
-        eventsFile.readLines().size() == 3
-
-        cleanup:
-        println(eventsFile.text)
+        expect:
+        GroovyAssert.assertScript(script)
     }
 }

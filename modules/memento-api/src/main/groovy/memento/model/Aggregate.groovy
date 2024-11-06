@@ -68,7 +68,7 @@ class Aggregate {
      * @since 0.1.0
      */
     <U extends Aggregate> U apply(Event event) {
-        this.bindFunctions[event.class].call(this, event)
+        this.bindFunctions[event.class]?.call(this, event)
         event.version = this.nextVersion
 
         if (event.aggregateId){

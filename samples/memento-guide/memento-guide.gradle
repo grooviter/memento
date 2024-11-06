@@ -13,6 +13,7 @@ dependencies {
     implementation("org.apache.groovy:groovy:$groovy")
     implementation("org.apache.groovy:groovy-contracts:$groovy")
     implementation("org.apache.groovy:groovy-json:$groovy")
+    testImplementation("org.apache.groovy:groovy-test:$groovy")
     testImplementation("org.spockframework:spock-core:$spockframework")
     testImplementation("org.spockframework:spock-junit4:$spockframework")
 }

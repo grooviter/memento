@@ -22,4 +22,6 @@ include::use_cases.adoc[]
 
 include::implementations.adoc[]
 
+include::samples.adoc[]
+
 include::license.adoc[]

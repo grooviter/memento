@@ -1,0 +1,8 @@
+== Samples
+:github-repo: https://github.com/grooviter/memento/tree/master/samples
+
+There are several examples in the Github Repository in the link:{github-repo}[samples folder]:
+
+- link:{github-repo}/memento-guide[Samples included in the guide]
+- link:{github-repo}/memento-bank[Bank CLI application]
+- link:{github-repo}/memento-cargo[Delivery application]
