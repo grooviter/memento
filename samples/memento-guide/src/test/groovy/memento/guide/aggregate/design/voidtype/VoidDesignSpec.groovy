@@ -40,22 +40,26 @@ class VoidDesignSpec extends Specification {
         // PUT /api/case/{UUID}/test
         patientCase = eventStore.load(aggregateUUID, PatientCase).get()
         patientCase.testApplied("X-Ray")
+        eventStore.save(patientCase)
 
         // PUT /api/case/{UUID}/doctor
         patientCase = eventStore.load(aggregateUUID, PatientCase).get()
         patientCase.diagnosisConfirmed("doctor-1000")
+        eventStore.save(patientCase)
 
         // PUT /api/case/{UUID}/drug
         patientCase = eventStore.load(aggregateUUID, PatientCase).get()
         patientCase.drugPrescribed("drug-1000")
+        eventStore.save(patientCase)
 
         // PUT /api/case/close
         patientCase = eventStore.load(aggregateUUID, PatientCase).get()
         patientCase.caseClosed()
+        eventStore.save(patientCase)
         // end::usage[]
         then:
         with(patientCase) {
-            eventList.size() == 5
+            eventList.size() == 1 // it only has the last event since last reloading
             patientId == 'patient-1000'
             testApplied == 'X-Ray'
             diagnosedByDoctorId == 'doctor-1000'

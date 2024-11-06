@@ -51,7 +51,7 @@ class GettingStartedSpec extends Specification {
         
         // CREATING AND STORING AN AGGREGATE.... <5>
         Document document = new Document(UUID.randomUUID())
-            .apply(new Created("Memento", "Christopher Nolan")
+            .apply(new Created("Memento", "Christopher Nolan"))
             .apply(new Appended("A man who, as a result of an injury,"))
             .apply(new Appended(", has anterograde amnesia"))
             .apply(new Appended("and has short-term memory loss"))
