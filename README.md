@@ -1,6 +1,4 @@
-[![license](https://img.shields.io/github/license/grooviter/memento.svg)]()
-
-**AT THE MOMENT MEMENTO IS STILL IN ALPHA PHASE**
+[![license](https://img.shields.io/github/license/grooviter/memento.svg)]() [![main](https://github.com/grooviter/memento/actions/workflows/gql-release.yml/badge.svg?branch=main)](https://github.com/grooviter/memento/actions/workflows/gql-release.yml) ![Maven Central](https://img.shields.io/maven-central/v/com.github.grooviter/memento-csv)
 
 ## What is Memento ?
 
@@ -20,7 +18,7 @@ repositories {
 Then add the base dependency to your project:
 
 ```groovy
-compile 'com.github.grooviter:memento-csv:0.1.0-SNAPSHOT'
+compile 'com.github.grooviter:memento-csv:0.1.0'
 ```
 
 ## Grab

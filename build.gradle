@@ -57,7 +57,6 @@ config {
         }
     }
     publishing {
-        enabled             = true
         releasesRepository  = 'releases'
         snapshotsRepository = 'snapshots'
         signing {
