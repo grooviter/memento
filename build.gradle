@@ -79,6 +79,7 @@ config {
         groovydoc {
             enabled = true
             replaceJavadoc = true
+            excludes = ['*.yml', '*.xml']
             options {
                 docTitle = "Memento"
                 windowTitle = "Memento: Groovy EventStore Library"
@@ -86,8 +87,14 @@ config {
                 link 'http://docs.groovy-lang.org/latest/html/api/', 'groovy', 'org.codehaus.groovy'
             }
             aggregate {
-                enabled        = true
-                replaceJavadoc = true
+                enabled          = true
+                replaceJavadoc   = true
+                excludedProjects.addAll([
+                    project('guide'),
+                    project('memento-bank'),
+                    project('memento-cargo'),
+                    project('memento-guide')
+                ])
             }
         }
     }
@@ -158,9 +165,10 @@ allprojects {
         options.encoding    = 'UTF-8'
     }
 
-    configurations.codenarc {
+    configurations.configureEach {
         resolutionStrategy {
             force "org.codehaus.groovy:groovy:$groovy"
+            force "org.codehaus.groovy:groovy-xml:$groovy"
         }
     }
 }

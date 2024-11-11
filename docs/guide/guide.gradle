@@ -1,22 +1,59 @@
-apply plugin: 'org.kordamp.gradle.guide'
+plugins {
+    id('org.kordamp.gradle.guide')
+    id('org.asciidoctor.jvm.convert')
+}
 
-repositories {
-    mavenCentral()
+tasks.register("generateDocumentation") {
+    dependsOn(
+        ':memento-api:groovydoc',
+        ':memento-base:groovydoc',
+        ':memento-csv:groovydoc',
+        ':memento-micronaut-jdbc:groovydoc',
+        "::aggregateGroovydoc",
+        asciidoctor
+    )
+
+    doLast {
+        copy {
+            from "$rootDir/build/docs/aggregate-groovydoc"
+            into "$buildDir/site/api/"
+        }
+        copy {
+            from "src/docs/site"
+            into "$buildDir/site"
+        }
+    }
+}
+
+tasks.register("setAuthentication") {
+    doLast {
+        System.setProperty("org.ajoberstar.grgit.auth.username", "${findProperty('PUBLISH_GH_TOKEN')}")
+    }
+}
+
+gitPublishPush {
+    dependsOn 'setAuthentication'
+    dependsOn 'generateDocumentation'
 }
 
 asciidoctor {
     baseDirFollowsSourceDir()
+    outputDir layout.buildDirectory.dir("site").get()
     attributes(
         'memento': version,
         'toc': 'left',
         'source-highlighter': 'coderay'
     )
-
     resources {
         from('src/docs/images') {
             include '**/*'
         }
-
         into './images'
+    }
+}
+
+asciidoctorj {
+    modules {
+        diagram.version '2.1.0'
     }
 }
