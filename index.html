@@ -14,44 +14,1365 @@
 <div id="header">
 <h1>Memento</h1>
 <div class="details">
-<span id="revnumber">version 0.1.0-SNAPSHOT</span>
+<span id="revnumber">version 0.1.0</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
-<li><a href="#_introduction">1. Introduction</a>
+<li><a href="#_introduction">1. Introduction</a></li>
+<li><a href="#_getting_started">2. Getting started</a></li>
+<li><a href="#_usage">3. Usage</a></li>
+<li><a href="#_aggregate">4. Aggregate</a>
 <ul class="sectlevel2">
-<li><a href="#_event_sourcing">1.1. Event Sourcing</a></li>
-<li><a href="#_overview">1.2. Overview</a></li>
+<li><a href="#_creating">4.1. Creating</a></li>
+<li><a href="#_adding_events">4.2. Adding events</a></li>
+<li><a href="#_bind_methods">4.3. Bind methods</a></li>
+<li><a href="#_design">4.4. Design</a>
+<ul class="sectlevel3">
+<li><a href="#_method_chaining">4.4.1. Method chaining</a></li>
+<li><a href="#_void">4.4.2. Void</a></li>
+<li><a href="#_raw_apply">4.4.3. Raw apply</a></li>
 </ul>
 </li>
-<li><a href="#_getting_started">2. Getting started</a></li>
-<li><a href="#_general_usage">3. General Usage</a></li>
-<li><a href="#_micronaut_data">4. Micronaut Data</a></li>
+</ul>
+</li>
+<li><a href="#_event">5. Event</a></li>
+<li><a href="#_eventstore">6. EventStore</a>
+<ul class="sectlevel2">
+<li><a href="#_storage">6.1. Storage</a></li>
+<li><a href="#_event_bus">6.2. Event Bus</a></li>
+<li><a href="#_serde">6.3. Serde</a>
+<ul class="sectlevel3">
+<li><a href="#_jackson">6.3.1. Jackson</a></li>
+<li><a href="#_custom_serde">6.3.2. Custom Serde</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_use_cases">7. Use cases</a>
+<ul class="sectlevel2">
+<li><a href="#_historical_review">7.1. Historical Review</a></li>
+<li><a href="#_heterogeneous_uses">7.2. Heterogeneous Uses</a></li>
+<li><a href="#_resources">7.3. Resources</a></li>
+</ul>
+</li>
+<li><a href="#_implementations">8. Implementations</a>
+<ul class="sectlevel2">
+<li><a href="#_csv">8.1. CSV</a>
+<ul class="sectlevel3">
+<li><a href="#_usage_2">8.1.1. Usage</a></li>
+<li><a href="#_example">8.1.2. Example</a></li>
+</ul>
+</li>
+<li><a href="#_micronaut_data_jdbc">8.2. Micronaut Data (jdbc)</a>
+<ul class="sectlevel3">
+<li><a href="#_usage_3">8.2.1. Usage</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_samples">9. Samples</a></li>
+<li><a href="#_license">10. License</a></li>
 </ul>
 </div>
 </div>
 <div id="content">
-<div id="preamble">
+<div class="sect1">
+<h2 id="_introduction"><a class="anchor" href="#_introduction"></a>1. Introduction</h2>
 <div class="sectionbody">
+<div class="paragraph">
+<p>Memento is a Groovy library which can be used to implement an Event Sourcing solution. Memento tries to provide a high
+level abstraction for different event sourcing concepts such as:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Aggregate</strong>: Is the subject of a group of events.</p>
+</li>
+<li>
+<p><strong>Event</strong>: Something that expresses a change in a specific aggregate.</p>
+</li>
+<li>
+<p><strong>EventStore</strong>: Stores and retrieves all aggregates events, and it&#8217;s capable of restore the state of an aggregate</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_getting_started"><a class="anchor" href="#_getting_started"></a>2. Getting started</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The following example presents a <strong>Document</strong> aggregate:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The Document can support different types of events such as <strong>creating a document</strong> (Created)
+or <strong>appending text</strong> to the document (Appended).</p>
+</li>
+<li>
+<p>Also an <strong>EventStore</strong> implementation is created to store the aggregate events. This particular implementation stores events
+and snapshots <strong>as csv files</strong>.</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="title">save an aggregate</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="annotation">@Grab</span>(<span class="string"><span class="delimiter">'</span><span class="content">com.github.grooviter:memento-csv:0.1.0</span><span class="delimiter">'</span></span>)
+<span class="keyword">import</span> <span class="include">memento.*</span>
+<span class="keyword">import</span> <span class="include">memento.model.*</span>
+<span class="keyword">import</span> <span class="include">groovy.transform.*</span>
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">java.util.UUID.randomUUID</span>
+
+<span class="comment">// EVENTS... </span><i class="conum" data-value="1"></i><b>(1)</b>
+<span class="annotation">@TupleConstructor</span>
+<span class="type">class</span> <span class="class">Created</span> <span class="directive">extends</span> <span class="predefined-type">Event</span>&lt;<span class="predefined-type">Document</span>&gt; {
+    <span class="predefined-type">String</span> title, author
+}
+
+<span class="annotation">@TupleConstructor</span>
+<span class="type">class</span> <span class="class">Appended</span> <span class="directive">extends</span> <span class="predefined-type">Event</span>&lt;<span class="predefined-type">Document</span>&gt; {
+    <span class="predefined-type">String</span> content
+}
+
+<span class="comment">// AGGREGATE... </span><i class="conum" data-value="2"></i><b>(2)</b>
+<span class="annotation">@InheritConstructors</span>
+<span class="type">class</span> <span class="class">Document</span> <span class="directive">extends</span> Aggregate {
+    <span class="predefined-type">String</span> title, author, content = <span class="error">\</span><span class="string"><span class="delimiter">'</span><span class="char">\'</span></span><span class="error">
+</span>    <span class="comment">// EVENT_CONFIGURATION... </span><i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="annotation">@Override</span>
+    <span class="type">void</span> configure() {
+        <span class="comment">// applies all matching event properties to Aggregate</span>
+        bind(Created)
+        <span class="comment">// applies event to Aggregate as defined in closure</span>
+        bind(Appended) { <span class="predefined-type">Document</span> doc, Appended event -&gt;
+            doc.content += event.content
+        }
+    }
+}
+
+<span class="comment">// EVENTSTORE IMPLEMENTATION... </span><i class="conum" data-value="4"></i><b>(4)</b>
+EventStore eventStore = Memento.builder()
+    .csvStorage(<span class="string"><span class="delimiter">'</span><span class="content">/tmp/events.csv</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">/tmp/snapshots.csv</span><span class="delimiter">'</span></span>)  <span class="comment">// STORAGE</span>
+    .jacksonSerde()                                       <span class="comment">// SERDE</span>
+    .snapshotThreshold(<span class="integer">2</span>) <span class="comment">// snapshot every 2 events</span>
+    .onEvent(<span class="predefined-type">Object</span>::println)                             <span class="comment">// EVENTBUS</span>
+    .build()
+
+<span class="comment">// CREATING AND STORING AN AGGREGATE.... </span><i class="conum" data-value="5"></i><b>(5)</b>
+<span class="predefined-type">Document</span> document = <span class="keyword">new</span> <span class="predefined-type">Document</span>(<span class="predefined-type">UUID</span>.randomUUID())
+    .apply(<span class="keyword">new</span> Created(<span class="string"><span class="delimiter">&quot;</span><span class="content">Memento</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Christopher Nolan</span><span class="delimiter">&quot;</span></span>))
+    .apply(<span class="keyword">new</span> Appended(<span class="string"><span class="delimiter">&quot;</span><span class="content">A man who, as a result of an injury,</span><span class="delimiter">&quot;</span></span>))
+    .apply(<span class="keyword">new</span> Appended(<span class="string"><span class="delimiter">&quot;</span><span class="content">, has anterograde amnesia</span><span class="delimiter">&quot;</span></span>))
+    .apply(<span class="keyword">new</span> Appended(<span class="string"><span class="delimiter">&quot;</span><span class="content">and has short-term memory loss</span><span class="delimiter">&quot;</span></span>))
+    .apply(<span class="keyword">new</span> Appended(<span class="string"><span class="delimiter">&quot;</span><span class="content">approximately every fifteen minutes.</span><span class="delimiter">&quot;</span></span>))
+
+<span class="comment">// SAVING THE AGGREGATE's EVENTS... </span><i class="conum" data-value="6"></i><b>(6)</b>
+eventStore.save(document)</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The events used should extend the Event interface and have as generic value the class of the Aggregate</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Creating an aggregate. Check the <a href="#_aggregate">Aggregate section to know more</a></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Configuring how the aggregate is going to apply the events. The <code>void configure() {}</code> method is a hook in the aggregate used to register how
+events are going to be applied to the aggregate. There are some built-in <code>bind(&#8230;&#8203;)</code>
+functions to avoid creating boilerplate code. For example if <code>Created</code> has a <code>title</code> property, the <code>bind(class)</code> method
+when applying the <code>Created</code> event to the <code>Document</code> aggregate, it will set the aggregate <code>title</code> property with
+the <code>Created</code> event <code>title</code> property.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Configuring Memento engine responsible for storing aggregate events and snapshots. Is always mandatory to configure
+at least the <strong>storage, serialization and event bus</strong> you&#8217;re going to use. By default we are using a csv file storage to
+store both events and snapshots. Creating snapshots every two events. And the even bus we&#8217;ve configured is just
+printing out the events inserted in the event store.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>Creating an aggregate and adding events to it</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>Storing the aggregate state to the configured memento engine.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>If you take a look at the <strong>events.csv</strong> file you will see the following.</p>
+</div>
+<div class="listingblock">
+<div class="title">events.csv</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="shell">...-6740974752dc|1|Created|{&quot;title&quot;:&quot;Memento&quot;,&quot;aggregateId&quot;:&quot;5f5469ba-a031-4ccb...
+...-6740974752dc|2|Appended|{&quot;content&quot;:&quot;A man who, as a result of an injury&quot;,&quot;aggregate...
+...</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_usage"><a class="anchor" href="#_usage"></a>3. Usage</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In order to use Memento in your Gradle project:</p>
+</div>
+<div class="listingblock">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">repositories {
+    mavenCentral()
+}
+
+dependencies {
+    <span class="comment">// ONLY if you'd like to implement your own event store</span>
+    implementation <span class="string"><span class="delimiter">'</span><span class="content">com.github.grooviter:memento-base:$VERSION</span><span class="delimiter">'</span></span>
+
+    <span class="comment">// ONLY if you'd like to store events in CSV files</span>
+    implementation <span class="string"><span class="delimiter">'</span><span class="content">com.github.grooviter:memento-csv:$VERSION</span><span class="delimiter">'</span></span>
+
+    <span class="comment">// ONLY if you'd planning to use Micronaut's data JDBC as event storage</span>
+    implementation <span class="string"><span class="delimiter">'</span><span class="content">com.github.grooviter:memento-micronaut-jdbc:$VERSIONf</span><span class="delimiter">'</span></span>
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Or as we mentioned in <a href="getting.adoc">the getting started section</a> use it in your Groovy scripts directly:</p>
+</div>
+<div class="listingblock">
+<div class="title">Groovy Script</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="annotation">@Grab</span>(<span class="string"><span class="delimiter">'</span><span class="content">com.github.grooviter:memento-csv:$VERSION</span><span class="delimiter">'</span></span>)
+<span class="comment">// @Grab('com.github.grooviter:memento-base:$VERSION')</span>
+<span class="comment">// @Grab('com.github.grooviter:memento-micronaut-jdbc:$VERSION')</span>
+<span class="keyword">import</span> <span class="include">memento.*</span>
+
+<span class="comment">// your code here</span></code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_aggregate"><a class="anchor" href="#_aggregate"></a>4. Aggregate</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>An aggregate in Memento is a class extending <code>memento.Aggreggate</code>:</p>
+</div>
+<div class="listingblock">
+<div class="title">Aggregate</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="type">class</span> <span class="class">MyAggregate</span> <span class="directive">extends</span> Aggregate {
+  <span class="predefined-type">String</span> clientId
+}</code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_creating"><a class="anchor" href="#_creating"></a>4.1. Creating</h3>
+<div class="paragraph">
+<p>Before applying any event to the aggregate, we need to create an instance of it. The only attribute required up front
+is the aggregate property <code>id</code>. All events applied to that aggregate will be related to it via the aggregate id.</p>
+</div>
+<div class="paragraph">
+<p>For example, a possible way to do it is to create a <code>static method</code>:</p>
+</div>
+<div class="listingblock">
+<div class="title">Create Aggregate (static)</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">import</span> <span class="include">memento.model.*</span>
+
+<span class="type">class</span> <span class="class">Delivery</span> <span class="directive">extends</span> Aggregate {
+    <span class="predefined-type">String</span> clientId
+
+    <span class="directive">static</span> Delivery create() {
+        <span class="keyword">return</span> <span class="keyword">new</span> Delivery(<span class="key">id</span>: <span class="predefined-type">UUID</span>.randomUUID())
+    }
+}
+<span class="keyword">def</span> delivery = Delivery.create()
+<span class="comment">// ...and then apply events to the instance</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>or maybe using a constructor:</p>
+</div>
+<div class="listingblock">
+<div class="title">Create Aggregate (Constructor)</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">import</span> <span class="include">memento.model.*</span>
+
+<span class="type">class</span> <span class="class">Delivery</span> <span class="directive">extends</span> Aggregate {
+    <span class="predefined-type">String</span> clientId
+
+    Delivery(<span class="predefined-type">UUID</span> id) {
+       <span class="local-variable">super</span>(id)
+    }
+}
+<span class="keyword">def</span> delivery = <span class="keyword">new</span> Delivery(<span class="predefined-type">UUID</span>.randomUUID())
+<span class="comment">// ...and then apply events to the instance</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Of course we can short it with Groovy&#8217;s <code>@InheritConstructors</code>:</p>
+</div>
+<div class="listingblock">
+<div class="title">Create Aggregate (@InheritConstructors)</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">import</span> <span class="include">memento.model.*</span>
+<span class="keyword">import</span> <span class="include">groovy.transform.*</span>
+
+<span class="annotation">@InheritConstructors</span>()
+<span class="type">class</span> <span class="class">Delivery</span> <span class="directive">extends</span> Aggregate {
+    <span class="predefined-type">String</span> clientId
+}
+<span class="keyword">def</span> delivery = <span class="keyword">new</span> Delivery(<span class="predefined-type">UUID</span>.randomUUID())
+<span class="comment">// ...and then apply events to the instance</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_adding_events"><a class="anchor" href="#_adding_events"></a>4.2. Adding events</h3>
+<div class="paragraph">
+<p>Once we&#8217;ve got an aggregate instance we can add events to it. An aggregate represents a domain context where a set of
+events will be applied. For example, imagine an events over the aggregate <code>Delivery</code> such as:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>REQUESTED</strong>: a client has bought something and has triggered a new delivery</p>
+</li>
+<li>
+<p><strong>RECEIVED</strong>: once the purchase arrives to the client&#8217;s address the delivery received event is applied</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The aggregate model could be modelled as:</p>
+</div>
+<div class="listingblock">
+<div class="title">Adding events</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> memento.guide.aggregate.nobind
+
+<span class="type">interface</span> DeliveryProcess {
+    <span class="type">void</span> requested(<span class="predefined-type">String</span> clientId)
+    <span class="type">void</span> received()
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>And the events we&#8217;d like to use. Please <strong>notice how the name of the events properties match the aggregate properties</strong>,
+that will be important later on:</p>
+</div>
+<div class="listingblock">
+<div class="title">DeliveryRequested</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> memento.guide.aggregate.nobind
+
+<span class="keyword">import</span> <span class="include">memento.model.Event</span>
+
+<span class="type">class</span> <span class="class">DeliveryRequested</span> <span class="directive">extends</span> <span class="predefined-type">Event</span>&lt;Delivery&gt; {
+    <span class="predefined-type">String</span> clientId
+    <span class="predefined-type">Date</span> deliveryRequestedAt = <span class="keyword">new</span> <span class="predefined-type">Date</span>()
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DeliveryReceived</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> memento.guide.aggregate.nobind
+
+<span class="keyword">import</span> <span class="include">memento.model.Event</span>
+
+<span class="type">class</span> <span class="class">DeliveryReceived</span> <span class="directive">extends</span> <span class="predefined-type">Event</span>&lt;Delivery&gt; {
+    <span class="predefined-type">Date</span> deliveryReceivedAt = <span class="keyword">new</span> <span class="predefined-type">Date</span>()
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Now lets see how do we apply these events to the aggregate:</p>
+</div>
+<div class="listingblock">
+<div class="title">Aggregate#apply</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> memento.guide.aggregate.nobind
+
+<span class="keyword">import</span> <span class="include">groovy.transform.InheritConstructors</span>
+<span class="keyword">import</span> <span class="include">memento.model.Aggregate</span>
+
+<span class="annotation">@InheritConstructors</span>
+<span class="type">class</span> <span class="class">Delivery</span> <span class="directive">extends</span> Aggregate <span class="directive">implements</span> DeliveryProcess {
+    <span class="predefined-type">String</span> clientId
+    <span class="predefined-type">Date</span> deliveryRequestedAt, deliveryReceivedAt
+
+    <span class="annotation">@Override</span>
+    <span class="type">void</span> requested(<span class="predefined-type">String</span> clientId) {
+        <span class="local-variable">this</span>.apply(<span class="keyword">new</span> DeliveryRequested(<span class="key">clientId</span>: clientId))
+    }
+
+    <span class="annotation">@Override</span>
+    <span class="type">void</span> received() {
+        <span class="local-variable">this</span>.apply(<span class="keyword">new</span> DeliveryReceived())
+    }
+
+    <span class="directive">private</span> <span class="type">void</span> apply(DeliveryRequested requested) {
+        <span class="local-variable">super</span>.apply(requested) <i class="conum" data-value="1"></i><b>(1)</b>
+        <span class="local-variable">this</span>.clientId = requested.clientId <i class="conum" data-value="2"></i><b>(2)</b>
+        <span class="local-variable">this</span>.deliveryRequestedAt = requested.deliveryRequestedAt
+    }
+
+    <span class="directive">private</span> <span class="type">void</span> apply(DeliveryReceived received) {
+        <span class="local-variable">super</span>.apply(received)
+        <span class="local-variable">this</span>.deliveryReceivedAt = received.deliveryReceivedAt
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Triggers event versioning</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Changes aggregate state</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The original <code>super.apply(event)</code>, only triggers event versioning. Event versioning means:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>The applied event is given a version id</strong> so that we know which order the events happened.</p>
+</li>
+<li>
+<p><strong>The applied event is given a unique id</strong> to the event when applied to the aggregate.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Apart from these characteristics <strong>we&#8217;d like to update the state of the aggregate</strong>, that&#8217;s why we create as many overloaded
+apply methods as the number of events we&#8217;d like to apply to the aggregate. However is a little bit verbose and there
+are a couple of methods specifically created to avoid creating this extra <code>apply</code> methods, the <code>bind(&#8230;&#8203;)</code> methods
+explained in the next section.</p>
+</div>
+<div class="paragraph">
+<p>Once you&#8217;ve got your aggregate you can use it and add your events. This is a Spock test example:</p>
+</div>
+<div class="listingblock">
+<div class="title">Adding events (no-bind)</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">    <span class="type">void</span> <span class="string"><span class="delimiter">'</span><span class="content">creating events</span><span class="delimiter">'</span></span>() {
+        <span class="key">setup</span>:
+        Delivery delivery = <span class="keyword">new</span> Delivery(<span class="predefined-type">UUID</span>.randomUUID())
+
+        <span class="key">when</span>:
+        delivery.requested(<span class="string"><span class="delimiter">&quot;</span><span class="content">1000</span><span class="delimiter">&quot;</span></span>)
+
+        <span class="key">then</span>:
+        delivery.eventList.size() == <span class="integer">1</span>
+        delivery.eventList[<span class="integer">0</span>].version == <span class="integer">1</span>
+
+        <span class="key">when</span>:
+        delivery.received()
+
+        <span class="key">then</span>:
+        delivery.eventList.size() == <span class="integer">2</span>
+        delivery.eventList[<span class="integer">1</span>].version == <span class="integer">2</span>
+    }</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_bind_methods"><a class="anchor" href="#_bind_methods"></a>4.3. Bind methods</h3>
+<div class="paragraph">
+<p>These overloaded <code>apply</code> methods are pretty common that&#8217;s why there&#8217;s an alternative to avoid all that boilerplate code.
+If we reviewed the previous example, but now using the <code>bind</code> method:</p>
+</div>
+<div class="listingblock">
+<div class="title">Aggregate with bind methods</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> memento.guide.aggregate.full
+
+<span class="keyword">import</span> <span class="include">groovy.transform.InheritConstructors</span>
+<span class="keyword">import</span> <span class="include">memento.model.Aggregate</span>
+
+<span class="annotation">@InheritConstructors</span>
+<span class="type">class</span> <span class="class">Delivery</span> <span class="directive">extends</span> Aggregate <span class="directive">implements</span> DeliveryProcess {
+    <span class="predefined-type">String</span> clientId
+    <span class="predefined-type">Date</span> deliveryRequestedAt, deliveryReceivedAt
+
+    <span class="annotation">@Override</span>
+    <span class="type">void</span> requested(<span class="predefined-type">String</span> clientId) {
+        <span class="local-variable">this</span>.apply(<span class="keyword">new</span> DeliveryRequested(<span class="key">clientId</span>: clientId))
+    }
+
+    <span class="annotation">@Override</span>
+    <span class="type">void</span> received() {
+        <span class="local-variable">this</span>.apply(<span class="keyword">new</span> DeliveryReceived())
+    }
+
+    <span class="annotation">@Override</span>
+    <span class="type">void</span> configure() { <i class="conum" data-value="1"></i><b>(1)</b>
+        bind(DeliveryRequested, DeliveryReceived) <i class="conum" data-value="2"></i><b>(2)</b>
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The <code>Aggregate</code> class has a hook method <code>Aggregate#configure()</code> that should be used to register the functions telling the
+aggregate how to process incoming events</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>In order to avoid boilerplate code, the <code>Aggregate#bind(&#8230;&#8203;)</code> methods. <code>Aggregate#bind(Class&lt;Event)</code> copies the
+properties matching the aggregate</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Then event handing should work the same:</p>
+</div>
+<div class="listingblock">
+<div class="title">Adding events (bind)</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">    <span class="type">void</span> <span class="string"><span class="delimiter">'</span><span class="content">creating events</span><span class="delimiter">'</span></span>() {
+        <span class="key">setup</span>:
+        Delivery delivery = <span class="keyword">new</span> Delivery(<span class="predefined-type">UUID</span>.randomUUID())
+
+        <span class="key">when</span>:
+        delivery.requested(<span class="string"><span class="delimiter">&quot;</span><span class="content">1000</span><span class="delimiter">&quot;</span></span>)
+
+        <span class="key">then</span>:
+        delivery.eventList.size() == <span class="integer">1</span>
+        delivery.eventList[<span class="integer">0</span>].version == <span class="integer">1</span>
+
+        <span class="key">when</span>:
+        delivery.received()
+
+        <span class="key">then</span>:
+        delivery.eventList.size() == <span class="integer">2</span>
+        delivery.eventList[<span class="integer">1</span>].version == <span class="integer">2</span>
+    }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In this example both <code>Delivery</code> and <code>Requested</code> classes have a field named <code>clientId</code>. So by using:</p>
+</div>
+<div class="listingblock">
+<div class="title">bind(Event)</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">bind(Requested)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Every time the <code>Requested</code> event is applied to the <code>Delivery</code> instance it will copy the value from <code>Requested#clientId</code> to
+<code>Delivery#clientId</code>.</p>
+</div>
+<div class="paragraph">
+<p>There&#8217;s a variant of this method that allows to handle an array of event types to be applied:</p>
+</div>
+<div class="listingblock">
+<div class="title">bind(Event&#8230;&#8203;)</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">bind(Requested, Received...)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>There&#8217;s another method <code>Aggregate#bind(Event, Closure)</code> when the logic is more complex.</p>
+</div>
+<div class="listingblock">
+<div class="title">bind(Event, Closure)</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">bind(Requested) { Delivery delivery, Requested event -&gt;
+    delivery.clientId = event.clientId
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The Closure params are the Aggregate type the event is going to be applied to, and the event type is going to be applied.
+Imagine we&#8217;ve got events with properties not matching the aggregate properties:</p>
+</div>
+<div class="listingblock">
+<div class="title">DeliveryRequested (custom)</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> memento.guide.aggregate.bindcustom
+
+<span class="keyword">import</span> <span class="include">memento.model.Event</span>
+
+<span class="type">class</span> <span class="class">DeliveryRequested</span> <span class="directive">extends</span> <span class="predefined-type">Event</span>&lt;Delivery&gt; {
+    <span class="predefined-type">String</span> userId
+    <span class="predefined-type">Date</span> requestedAt = <span class="keyword">new</span> <span class="predefined-type">Date</span>()
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DeliveryReceived (custom)</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> memento.guide.aggregate.bindcustom
+
+<span class="keyword">import</span> <span class="include">memento.model.Event</span>
+
+<span class="type">class</span> <span class="class">DeliveryReceived</span> <span class="directive">extends</span> <span class="predefined-type">Event</span>&lt;Delivery&gt; {
+    <span class="predefined-type">Date</span> receivedAt = <span class="keyword">new</span> <span class="predefined-type">Date</span>()
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then you can match the state of the aggregate using the <code>bind(Class, Closure)</code> methods inside the <code>void configure()</code> method
+block:</p>
+</div>
+<div class="listingblock">
+<div class="title">Delivery (custom events)</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> memento.guide.aggregate.bindcustom
+
+<span class="keyword">import</span> <span class="include">groovy.transform.InheritConstructors</span>
+<span class="keyword">import</span> <span class="include">memento.model.Aggregate</span>
+
+<span class="annotation">@InheritConstructors</span>
+<span class="type">class</span> <span class="class">Delivery</span> <span class="directive">extends</span> Aggregate <span class="directive">implements</span> DeliveryProcess {
+    <span class="predefined-type">String</span> clientId
+    <span class="predefined-type">Date</span> deliveryRequestedAt, deliveryReceivedAt
+
+    <span class="annotation">@Override</span>
+    <span class="type">void</span> requested(<span class="predefined-type">String</span> clientId) {
+        <span class="local-variable">this</span>.apply(<span class="keyword">new</span> DeliveryRequested(<span class="key">userId</span>: clientId))
+    }
+
+    <span class="annotation">@Override</span>
+    <span class="type">void</span> received() {
+        <span class="local-variable">this</span>.apply(<span class="keyword">new</span> DeliveryReceived())
+    }
+
+    <span class="annotation">@Override</span>
+    <span class="type">void</span> configure() {
+        bind(DeliveryRequested) { Delivery delivery, DeliveryRequested event -&gt;
+            delivery.clientId = event.userId
+            delivery.deliveryRequestedAt = event.requestedAt
+        }
+
+        bind(DeliveryReceived) { Delivery delivery, DeliveryReceived event -&gt;
+            delivery.deliveryReceivedAt = event.receivedAt
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>There&#8217;s still something to comment on the <code>bind(Class, Closure)</code> method usage&#8230;&#8203;</p>
+</div>
 <div class="sidebarblock">
 <div class="content">
-<div class="title">Apache 2.0</div>
+<div class="title">Why Event&lt;Aggregate&gt; should match Aggregate ?</div>
 <div class="paragraph">
-<p><strong>Memento</strong> is an open source project and its licensed under the <a href="http://www.apache.org/licenses/LICENSE-2.0.html">Apache 2 License</a>.</p>
+<p>When using the <code>bind(EventType, Closure)</code> method, it&#8217;s important to use the Aggregate in the generics argument of the
+Event:</p>
+</div>
+<div class="listingblock">
+<div class="title">Use aggregate in event generics</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="comment">// class EventType extends Event&lt;AggregateType&gt; {}</span>
+<span class="type">class</span> <span class="class">Requested</span> <span class="directive">extends</span> <span class="predefined-type">Event</span>&lt;Delivery&gt; {}
+<span class="type">class</span> <span class="class">Received</span> <span class="directive">extends</span> <span class="predefined-type">Event</span>&lt;Delivery&gt; {}
+<span class="type">class</span> <span class="class">Loaded</span> <span class="directive">extends</span> <span class="predefined-type">Event</span>&lt;Delivery&gt; {}
+
+<span class="comment">// class AggregateType extends Aggregate {}</span>
+<span class="type">class</span> <span class="class">Delivery</span> <span class="directive">extends</span> Aggregate {}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If we forgot to add the generic argument, for example:</p>
+</div>
+<div class="listingblock">
+<div class="title">Forgot aggregate in event generics</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="comment">// class EventType extends Event&lt;AggregateType&gt; {}</span>
+<span class="type">class</span> <span class="class">Requested</span> <span class="directive">extends</span> <span class="predefined-type">Event</span> {}
+<span class="type">class</span> <span class="class">Received</span> <span class="directive">extends</span> <span class="predefined-type">Event</span> {}
+<span class="type">class</span> <span class="class">Loaded</span> <span class="directive">extends</span> <span class="predefined-type">Event</span> {}
+
+<span class="comment">// class AggregateType extends Aggregate {}</span>
+<span class="type">class</span> <span class="class">Delivery</span> <span class="directive">extends</span> Aggregate {}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>When using the <code>bind(Class, Closure)</code> method the event type hint wouldn&#8217;t be recognized, so instead of seeing this
+in your IDE:</p>
+</div>
+<div class="listingblock">
+<div class="title">bind</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">bind(EventType) { AggregateType agg, EventType event -&gt;
+ <span class="comment">// here the aggregate specific type is recognized</span>
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Your method would look more like the following:</p>
+</div>
+<div class="listingblock">
+<div class="title">bind</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">bind(EventType) { Aggregate agg, EventType event -&gt;
+ <span class="comment">// here the aggregate specific type is not recognized</span>
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_design"><a class="anchor" href="#_design"></a>4.4. Design</h3>
+<div class="paragraph">
+<p>So far you may have seen that an aggregate class could be design in different ways. We&#8217;d like to comment a little bit
+on every different design strategy.</p>
+</div>
+<div class="sect3">
+<h4 id="_method_chaining"><a class="anchor" href="#_method_chaining"></a>4.4.1. Method chaining</h4>
+<div class="paragraph">
+<p>Method chaining strategy could be suited for:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Situations you&#8217;d want every time an event is applied the updated aggregate is returned.</p>
+</li>
+<li>
+<p>Proofs of concepts where you&#8217;d like to see how all possible events are going to be rendered or store in the underlying event store</p>
+</li>
+<li>
+<p>Still your methods can apply validations before applying the events</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Here we have an example with methods which always return the aggregate. See how by having these methods we can apply
+validation. In this case we&#8217;re using <a href="https://docs.groovy-lang.org/latest/html/documentation/#_groovy_contracts_design_by_contract_support_for_groovy">Groovy Contracts</a>
+to make sure certain methods are not used without meeting certain conditions.</p>
+</div>
+<div class="listingblock">
+<div class="title">Chained Aggregate</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> memento.guide.aggregate.design.chain
+
+<span class="keyword">import</span> <span class="include">groovy.contracts.Ensures</span>
+<span class="keyword">import</span> <span class="include">groovy.transform.InheritConstructors</span>
+<span class="keyword">import</span> <span class="include">memento.model.Aggregate</span>
+
+<span class="annotation">@InheritConstructors</span>
+<span class="type">class</span> <span class="class">PatientCase</span> <span class="directive">extends</span> Aggregate {
+    <span class="predefined-type">String</span> patientId
+    <span class="predefined-type">String</span> diagnosedByDoctorId
+    <span class="predefined-type">String</span> testApplied
+    <span class="predefined-type">String</span> prescribedDrug
+    <span class="predefined-type">Date</span> caseOpenedAt, caseClosedAt
+
+    <span class="annotation">@Ensures</span>({ patientId })
+    <span class="directive">static</span> PatientCase opened(<span class="predefined-type">String</span> patientId) {
+        <span class="keyword">return</span> <span class="keyword">new</span> PatientCase(<span class="predefined-type">UUID</span>.randomUUID()).apply(<span class="keyword">new</span> CaseOpened(patientId))
+    }
+
+    PatientCase testApplied(<span class="predefined-type">String</span> test) {
+        <span class="keyword">return</span> <span class="local-variable">this</span>.apply(<span class="keyword">new</span> TestDone(test))
+    }
+
+    <span class="annotation">@Ensures</span>({ testApplied })
+    PatientCase diagnosisConfirmed(<span class="predefined-type">String</span> doctorId) {
+        <span class="keyword">return</span> <span class="local-variable">this</span>.apply(<span class="keyword">new</span> DiagnosisConfirmed(doctorId))
+    }
+
+    <span class="annotation">@Ensures</span>({ diagnosedByDoctorId })
+    PatientCase drugPrescribed(<span class="predefined-type">String</span> drug) {
+        <span class="keyword">return</span> <span class="local-variable">this</span>.apply(<span class="keyword">new</span> DrugApplied(drug))
+    }
+
+    <span class="annotation">@Ensures</span>({ diagnosedByDoctorId &amp;&amp; caseOpenedAt &lt; caseClosedAt })
+    PatientCase caseClosed() {
+        <span class="keyword">return</span> <span class="local-variable">this</span>.apply(<span class="keyword">new</span> CaseClosed())
+    }
+
+    <span class="annotation">@Override</span>
+    <span class="type">void</span> configure() {
+        bind(CaseClosed, CaseOpened, DiagnosisConfirmed, DrugApplied, TestDone)
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This design allows using the aggregate this way:</p>
+</div>
+<div class="listingblock">
+<div class="title">Chained Aggregate usage</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">PatientCase patientCase = PatientCase.opened(<span class="string"><span class="delimiter">&quot;</span><span class="content">U92323</span><span class="delimiter">&quot;</span></span>)
+    .testApplied(<span class="string"><span class="delimiter">&quot;</span><span class="content">X-Ray</span><span class="delimiter">&quot;</span></span>)
+    .diagnosisConfirmed(<span class="string"><span class="delimiter">&quot;</span><span class="content">doctor-10001</span><span class="delimiter">&quot;</span></span>)
+    .drugPrescribed(<span class="string"><span class="delimiter">&quot;</span><span class="content">drug-1110</span><span class="delimiter">&quot;</span></span>)
+    .caseClosed()
+
+eventStore.save(patientCase)</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_void"><a class="anchor" href="#_void"></a>4.4.2. Void</h4>
+<div class="paragraph">
+<p>Although method chaining is really appealing, but most of the time in real application we may face that our aggregate
+is created and updated in different moments in time, so we may find no use on chaining the method calls, there are also
+some motivations for using the void strategy:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Your aggregate wants to stick to an interface and that interface doesn&#8217;t know anything about the aggregate</p>
+</li>
+<li>
+<p>You don&#8217;t want to return the aggregate every time an event is applied</p>
+</li>
+<li>
+<p>Still your aggregate methods can apply validations before applying the events</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Following the same example, lets say that the medical procedure is already defined in an interface:</p>
+</div>
+<div class="listingblock">
+<div class="title">Medical Procedure</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> memento.guide.aggregate.design.voidtype
+
+<span class="type">interface</span> MedicalProcedure {
+    <span class="type">void</span> opened(<span class="predefined-type">String</span> patientId)
+    <span class="type">void</span> testApplied(<span class="predefined-type">String</span> test)
+    <span class="type">void</span> diagnosisConfirmed(<span class="predefined-type">String</span> doctorId)
+    <span class="type">void</span> drugPrescribed(<span class="predefined-type">String</span> drug)
+    <span class="type">void</span> caseClosed()
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then your aggregate may look like this:</p>
+</div>
+<div class="listingblock">
+<div class="title">Aggregate (void)</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> memento.guide.aggregate.design.voidtype
+
+<span class="keyword">import</span> <span class="include">groovy.contracts.Ensures</span>
+<span class="keyword">import</span> <span class="include">groovy.transform.InheritConstructors</span>
+<span class="keyword">import</span> <span class="include">memento.model.Aggregate</span>
+
+<span class="annotation">@InheritConstructors</span>
+<span class="type">class</span> <span class="class">PatientCase</span> <span class="directive">extends</span> Aggregate <span class="directive">implements</span> MedicalProcedure {
+    <span class="predefined-type">String</span> patientId
+    <span class="predefined-type">String</span> diagnosedByDoctorId
+    <span class="predefined-type">String</span> testApplied
+    <span class="predefined-type">String</span> prescribedDrug
+    <span class="predefined-type">Date</span> caseOpenedAt, caseClosedAt
+
+    <span class="annotation">@Ensures</span>({ patientId })
+    <span class="type">void</span> opened(<span class="predefined-type">String</span> patientId) {
+        <span class="local-variable">this</span>.apply(<span class="keyword">new</span> CaseOpened(patientId))
+    }
+
+    <span class="type">void</span> testApplied(<span class="predefined-type">String</span> test) {
+        <span class="local-variable">this</span>.apply(<span class="keyword">new</span> TestDone(test))
+    }
+
+    <span class="annotation">@Ensures</span>({ testApplied })
+    <span class="type">void</span> diagnosisConfirmed(<span class="predefined-type">String</span> doctorId) {
+        <span class="local-variable">this</span>.apply(<span class="keyword">new</span> DiagnosisConfirmed(doctorId))
+    }
+
+    <span class="annotation">@Ensures</span>({ diagnosedByDoctorId })
+    <span class="type">void</span> drugPrescribed(<span class="predefined-type">String</span> drug) {
+        <span class="local-variable">this</span>.apply(<span class="keyword">new</span> DrugApplied(drug))
+    }
+
+    <span class="annotation">@Ensures</span>({ diagnosedByDoctorId &amp;&amp; caseOpenedAt &lt; caseClosedAt })
+    <span class="type">void</span> caseClosed() {
+        <span class="local-variable">this</span>.apply(<span class="keyword">new</span> CaseClosed())
+    }
+
+    <span class="annotation">@Override</span>
+    <span class="type">void</span> configure() {
+        bind(CaseClosed, CaseOpened, DiagnosisConfirmed, DrugApplied, TestDone)
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>And then imagine you are going to update the aggregate in different REST calls. For instance the case will be opened in
+a post call and the subsequent put calls may reload it from the event store and update it:</p>
+</div>
+<div class="listingblock">
+<div class="title">Void type usage</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="comment">// POST /api/case</span>
+PatientCase patientCase = <span class="keyword">new</span> PatientCase(aggregateUUID)
+patientCase.opened(<span class="string"><span class="delimiter">&quot;</span><span class="content">patient-1000</span><span class="delimiter">&quot;</span></span>)
+eventStore.save(patientCase)
+
+<span class="comment">// PUT /api/case/{UUID}/test</span>
+patientCase = eventStore.load(aggregateUUID, PatientCase).get()
+patientCase.testApplied(<span class="string"><span class="delimiter">&quot;</span><span class="content">X-Ray</span><span class="delimiter">&quot;</span></span>)
+eventStore.save(patientCase)
+
+<span class="comment">// PUT /api/case/{UUID}/doctor</span>
+patientCase = eventStore.load(aggregateUUID, PatientCase).get()
+patientCase.diagnosisConfirmed(<span class="string"><span class="delimiter">&quot;</span><span class="content">doctor-1000</span><span class="delimiter">&quot;</span></span>)
+eventStore.save(patientCase)
+
+<span class="comment">// PUT /api/case/{UUID}/drug</span>
+patientCase = eventStore.load(aggregateUUID, PatientCase).get()
+patientCase.drugPrescribed(<span class="string"><span class="delimiter">&quot;</span><span class="content">drug-1000</span><span class="delimiter">&quot;</span></span>)
+eventStore.save(patientCase)
+
+<span class="comment">// PUT /api/case/close</span>
+patientCase = eventStore.load(aggregateUUID, PatientCase).get()
+patientCase.caseClosed()
+eventStore.save(patientCase)</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_raw_apply"><a class="anchor" href="#_raw_apply"></a>4.4.3. Raw apply</h4>
+<div class="paragraph">
+<p>Nothing prevents you from using apply methods directly without creating any higher structure. Some scenarios for this
+could be:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>You don&#8217;t want to write any more code than you&#8217;d think is necessary to apply events</p>
+</li>
+<li>
+<p>Validations are done outside the aggregate</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Of course up front the aggregate will be lighter:</p>
+</div>
+<div class="listingblock">
+<div class="title">Raw aggregate</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> memento.guide.aggregate.design.raw
+
+<span class="keyword">import</span> <span class="include">groovy.transform.InheritConstructors</span>
+<span class="keyword">import</span> <span class="include">memento.model.Aggregate</span>
+
+<span class="annotation">@InheritConstructors</span>
+<span class="type">class</span> <span class="class">PatientCase</span> <span class="directive">extends</span> Aggregate {
+    <span class="predefined-type">String</span> patientId
+    <span class="predefined-type">String</span> diagnosedByDoctorId
+    <span class="predefined-type">String</span> testApplied
+    <span class="predefined-type">String</span> prescribedDrug
+    <span class="predefined-type">Date</span> caseOpenedAt, caseClosedAt
+
+    <span class="annotation">@Override</span>
+    <span class="type">void</span> configure() {
+        bind(CaseClosed, CaseOpened, DiagnosisConfirmed, DrugApplied, TestDone)
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>And then only using the default <code>Aggregate#apply(event)</code> method:</p>
+</div>
+<div class="listingblock">
+<div class="title">Raw usage</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">PatientCase patientCase = <span class="keyword">new</span> PatientCase(<span class="predefined-type">UUID</span>.randomUUID())
+    .apply(<span class="keyword">new</span> CaseOpened())
+    .apply(<span class="keyword">new</span> TestDone(<span class="string"><span class="delimiter">&quot;</span><span class="content">X-Ray</span><span class="delimiter">&quot;</span></span>))
+    .apply(<span class="keyword">new</span> DiagnosisConfirmed(<span class="string"><span class="delimiter">&quot;</span><span class="content">doctor-1000</span><span class="delimiter">&quot;</span></span>))
+    .apply(<span class="keyword">new</span> DrugApplied(<span class="string"><span class="delimiter">&quot;</span><span class="content">drug-1000</span><span class="delimiter">&quot;</span></span>))
+    .apply(<span class="keyword">new</span> CaseClosed())
+
+eventStore.save(patientCase)</code></pre>
+</div>
 </div>
 </div>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_introduction"><a class="anchor" href="#_introduction"></a>1. Introduction</h2>
+<h2 id="_event"><a class="anchor" href="#_event"></a>5. Event</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Memento tries to provide a high level abstraction for different EventStore implementations.</p>
+<p>An event in Memento is a class extending <code>memento.Event</code> and it will be always be applied
+to a specific type of Aggregate:</p>
+</div>
+<div class="listingblock">
+<div class="title">Declaring Event</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">import</span> <span class="include">memento.Event</span>
+
+<span class="type">class</span> <span class="class">MyEvent</span> <span class="directive">extends</span> <span class="predefined-type">Event</span>&lt;AggregateType&gt; {
+  <span class="comment">// event properties here</span>
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The event then can be applied to the aggregate it belongs to. The events will be integrated in the aggregate
+by using the <code>Aggregate#apply(event)</code> method. Although this method can be used directly, normally we can create
+domain related methods:</p>
+</div>
+<div class="listingblock">
+<div class="title">Declaring Event</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">import</span> <span class="include">memento.Event</span>
+<span class="keyword">import</span> <span class="include">groovy.transform.InheritConstructors</span>
+
+<span class="type">class</span> <span class="class">NameAdded</span> <span class="directive">extends</span> <span class="predefined-type">Event</span>&lt;User&gt; {
+    <span class="predefined-type">String</span> name
+}
+
+<span class="type">class</span> <span class="class">AddressAdded</span> <span class="directive">extends</span> <span class="predefined-type">Event</span>&lt;User&gt; {
+    <span class="predefined-type">String</span> address
+}
+
+<span class="annotation">@InheritConstructors</span>
+<span class="type">class</span> <span class="class">User</span> <span class="directive">extends</span> Aggregate {
+    <span class="predefined-type">String</span> name, address
+
+    <span class="directive">static</span> User create(<span class="predefined-type">String</span> name) {
+        <span class="keyword">return</span> <span class="keyword">new</span> User(<span class="predefined-type">UUID</span>.randomUUID).apply(<span class="keyword">new</span> NameAdded(name)
+    }
+
+    User mainAddress(<span class="predefined-type">String</span> address) {
+        <span class="keyword">return</span> <span class="local-variable">this</span>.apply(<span class="keyword">new</span> AddressAdded(address))
+    }
+
+    <span class="annotation">@Override</span>
+    <span class="type">void</span> configure() {
+        bind(NameAdded, AddressAdded)
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>And then we can use a fluid method chaining if we want to:</p>
+</div>
+<div class="listingblock">
+<div class="title">fluid method chaining</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">User aggregate = User
+    .create(<span class="string"><span class="delimiter">&quot;</span><span class="content">John</span><span class="delimiter">&quot;</span></span>)
+    .mainAddress(<span class="string"><span class="delimiter">&quot;</span><span class="content">42 First Avenue</span><span class="delimiter">&quot;</span></span>)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Once we have our aggregate populated we may need to persist all the events in some event store. This is explained in the
+next section.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_eventstore"><a class="anchor" href="#_eventstore"></a>6. EventStore</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In order to persist all the aggregate events we use an EventStore. A Memento <code>EventStore</code> instance is built on top of these three components:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>STORAGE</strong>: were events and snapshots are going to be stored (database, csv&#8230;&#8203;)</p>
+</li>
+<li>
+<p><strong>EVENT-BUS</strong>:: system to notify when events/snapshots are stored</p>
+</li>
+<li>
+<p><strong>SERDE</strong>: (serialization/deserialization) how to serialize/deserialize events to/from the storage</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>To create an <code>EventStore</code> in Memento you can use Memento builder:</p>
+</div>
+<div class="listingblock">
+<div class="title">EventStore</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">import</span> <span class="include">memento.*</span>
+
+EventStore eventStore = Memento.builder()
+    .eventStorage(...) <i class="conum" data-value="1"></i><b>(1)</b>
+    .eventBus(...) <i class="conum" data-value="2"></i><b>(2)</b>
+    .serde(...) <i class="conum" data-value="3"></i><b>(3)</b>
+    .snapshotThreshold(<span class="integer">2</span>) <i class="conum" data-value="4"></i><b>(4)</b>
+    .build()</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Declares where the events are going to be stored, it could a database, a csv file&#8230;&#8203;etc</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Every time an event is applied to the aggregate the event could be send to an event bus if it&#8217;s set</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Events are serialized and deserialized from the underlying event storage. Classes responsible for the serialization
+are handled by a implementation of the serde.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>We can customize how many events should be persisted before a new version of a snapshot is generated.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>For example, you can start storing your events with a CSV based event store <code>CsvEventStorage</code> and serializing
+events with Jackson JSON library:</p>
+</div>
+<div class="listingblock">
+<div class="title">CSV EventStore</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">import</span> <span class="include">memento.*</span>
+
+EventStore eventStore = Memento.builder()
+    .eventStorage(<span class="keyword">new</span> CsvEventStorage(eventsFile, snapshotsFile))
+    .onEvent(<span class="predefined-type">Object</span>::println)
+    .serde(<span class="keyword">new</span> JacksonEventSerde())
+    .build()</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Because every module in Memento provides new extension methods to the Memento builder instance, you can re-write the
+previous example as the following:</p>
+</div>
+<div class="listingblock">
+<div class="title">CSV EventStore (extension methods)</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">import</span> <span class="include">memento.*</span>
+
+EventStore eventStore = Memento.builder()
+    .csvStorage(eventsFile, snapshotsFile)
+    .onEvent(<span class="predefined-type">Object</span>::println)
+    .jacksonSerde()
+    .build()</code></pre>
+</div>
 </div>
 <div class="sect2">
-<h3 id="_event_sourcing"><a class="anchor" href="#_event_sourcing"></a>1.1. Event Sourcing</h3>
+<h3 id="_storage"><a class="anchor" href="#_storage"></a>6.1. Storage</h3>
+<div class="paragraph">
+<p>Basically where the events are going to be stored. That could be anything, a database, a csv file, queue systems. The
+only thing that matters is that the event information could be stored in such a way it could be later be used again
+to replay the state of the system.</p>
+</div>
+<div class="paragraph">
+<p>The event structure is:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>ID</strong>: id of the event</p>
+</li>
+<li>
+<p><strong>AGGREGATE ID</strong>: the id of the aggregate id the event belongs to</p>
+</li>
+<li>
+<p><strong>VERSION</strong>: version of the aggregate</p>
+</li>
+<li>
+<p><strong>JSON</strong>: the event payload</p>
+</li>
+<li>
+<p><strong>DATE</strong>: when the event happened</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Memento has a default CSF file storage. You can persist events by using CSV storage:</p>
+</div>
+<div class="listingblock">
+<div class="title">CSV Store</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">import</span> <span class="include">memento.*</span>
+
+EventStore eventStore = Memento.builder()
+    .eventStorage(<span class="keyword">new</span> CsvEventStorage(eventsFile, snapshotsFile))
+    .onEvent(<span class="predefined-type">Object</span>::println)
+    .serde(<span class="keyword">new</span> JacksonEventSerde())
+    .build()</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>eventsFile</code> and <code>snapshotsFile</code> could be either a String with the path of the files, or instances of type <code>File</code>.
+You can check more in the <a href="#_csv">implementations CSV section</a>.</p>
+</div>
+<div class="paragraph">
+<p>Apart from using CSV file there is another implementation using a database via the <code>memento-micronaut-jdbc</code> module. This
+module persist events in a database
+using <a href="https://micronaut-projects.github.io/micronaut-data/4.9.3/guide/#dbc">Micronaut Data (JDBC)</a>. More information
+on this event storage implementation in section <a href="#_micronaut_data_jdbc">implementations Micronaut Data (jdbc)</a></p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_event_bus"><a class="anchor" href="#_event_bus"></a>6.2. Event Bus</h3>
+<div class="paragraph">
+<p>Regarding that the event store is more used for reading than writing, there could be many systems that are interested
+in knowing when a new event has been stored in the system. In order to be able to publish notifications the event store
+uses an event bus. An event bus is a system that delivers messages from message producers to message receivers.</p>
+</div>
+<div class="paragraph">
+<p>Any event bus added to Memento&#8217;s event store builder should implement <code>memento.EventBusPort</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">package</span> memento
+
+<span class="keyword">import</span> <span class="include">memento.model.Event</span>
+
+<span class="type">interface</span> EventBusPort {
+    <span class="type">void</span> publish(<span class="predefined-type">Event</span> event, EventSerdePort serdePort)
+    <span class="type">void</span> publishAsync(<span class="predefined-type">Event</span> event, EventSerdePort serdePort)
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Sometimes you may just one to check that events trigger event bus by using the Memento builder <code>onEvent(Consumer&lt;Event&gt;)</code>:</p>
+</div>
+<div class="listingblock">
+<div class="title">Basic CSV EventStore</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="annotation">@Grab</span>(<span class="string"><span class="delimiter">'</span><span class="content">com.github.grooviter:memento-csv:$VERSION</span><span class="delimiter">'</span></span>)
+<span class="keyword">import</span> <span class="include">memento.*</span>
+
+EventStore eventStore = Memento.builder()
+    .csvStorage(<span class="string"><span class="delimiter">'</span><span class="content">/tmp/events.csv</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">/tmp/snapshots.csv</span><span class="delimiter">'</span></span>)
+    .snapshotThreshold(<span class="integer">2</span>)
+    .onEvent { event -&gt; println(<span class="string"><span class="delimiter">&quot;</span><span class="content">event: </span><span class="inline"><span class="inline-delimiter">$</span>event</span><span class="delimiter">&quot;</span></span>) } <i class="conum" data-value="1"></i><b>(1)</b>
+    .build()</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Every time a new event is persisted in the event store the <code>onEvent</code> method will be triggered</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_serde"><a class="anchor" href="#_serde"></a>6.3. Serde</h3>
+<div class="paragraph">
+<p>Because the payload of the event is JSON, we need to convert the event information to JSON and then re-create the
+object from that JSON. Serde is an acronym for <strong>SER</strong>ialization/<strong>DE</strong>serialization.</p>
+</div>
+<div class="sect3">
+<h4 id="_jackson"><a class="anchor" href="#_jackson"></a>6.3.1. Jackson</h4>
+<div class="paragraph">
+<p>Memento provides a default SERDE mechanism using the Jackson JSON library. By default when persisting an event the
+qualified name of the class is persisted. For example:</p>
+</div>
+<div class="listingblock">
+<div class="title">Default</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">EventStore eventStore = Memento.builder()
+    .csvStorage(eventsFile, snapshotsFile)
+    .onEvent(<span class="predefined-type">Object</span>::println)
+    .jacksonSerde()
+    .build()</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>When saving an aggregate instance, the persisted events will result in something like this:</p>
+</div>
+<div class="listingblock">
+<div class="title">Default output (CSV)</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="shell">59e93fbb-...|9cbf9152-...|1|memento.guide.eventstore.events.TicketOpened|{&quot;id&quot;:&quot;...&quot;}|&quot;2024-11-05T18:48&quot;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>But you can create aliases in order to make the resulting JSON nicer:</p>
+</div>
+<div class="listingblock">
+<div class="title">Mappings</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">Mappings customMappings = Mappings.builder()
+    .addMapping(<span class="string"><span class="delimiter">&quot;</span><span class="content">TICKET_OPENED</span><span class="delimiter">&quot;</span></span>, TicketOpened)
+    .addMapping(<span class="string"><span class="delimiter">&quot;</span><span class="content">TICKET_INFO_FULFILLED</span><span class="delimiter">&quot;</span></span>, TicketInfoProvided)
+    .addMapping(<span class="string"><span class="delimiter">&quot;</span><span class="content">TICKET_INFO_CONFIRMED</span><span class="delimiter">&quot;</span></span>, TicketInfoConfirmed)
+    .addMapping(<span class="string"><span class="delimiter">&quot;</span><span class="content">TICKET_PAYMENT_INFO</span><span class="delimiter">&quot;</span></span>, TicketPaymentInfoProvided)
+    .addMapping(<span class="string"><span class="delimiter">&quot;</span><span class="content">TICKET_PAYMENT_SENT</span><span class="delimiter">&quot;</span></span>, TicketPaymentSent)
+    .addMapping(<span class="string"><span class="delimiter">&quot;</span><span class="content">TICKET_PAYMENT_CONFIRMED</span><span class="delimiter">&quot;</span></span>, TicketPaymentConfirmed)
+    .addMapping(<span class="string"><span class="delimiter">&quot;</span><span class="content">TICKET_PURCHASED</span><span class="delimiter">&quot;</span></span>, TicketPurchased)
+    .build()</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>And then apply them to the serialization process.</p>
+</div>
+<div class="listingblock">
+<div class="title">EventStore</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">EventStore eventStore = Memento.builder()
+    .csvStorage(eventsFile, snapshotsFile)
+    .onEvent(<span class="predefined-type">Object</span>::println)
+    .jacksonSerde(customMappings)
+    .snapshotThreshold(<span class="integer">2</span>)
+    .build()</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The persisted events will result in something like this:</p>
+</div>
+<div class="listingblock">
+<div class="title">Mappings output (CSV)</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="shell">59e93fbb-...|9cbf9152-...|1|TICKET_OPENED|{&quot;id&quot;:&quot;...&quot;}|&quot;2024-11-05T18:48&quot;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_custom_serde"><a class="anchor" href="#_custom_serde"></a>6.3.2. Custom Serde</h4>
+<div class="paragraph">
+<p>You can provide your own serde mechanism by implementing the <code>memento.EventSerdePort</code> and pass it to
+memento event store builder <code>serde(EventSerdePort)</code>:</p>
+</div>
+<div class="listingblock">
+<div class="title">Custom serde implementation</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="type">class</span> <span class="class">YourImplementationSerde</span> <span class="directive">implements</span> EventSerdePort {
+    ...
+}
+
+EventStore eventStore = Memento.builder()
+    .csvStorage(<span class="string"><span class="delimiter">'</span><span class="content">/tmp/events.csv</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">/tmp/snapshots.csv</span><span class="delimiter">'</span></span>)
+    .serde(<span class="keyword">new</span> YourImplementationSerde())
+    .build()</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_use_cases"><a class="anchor" href="#_use_cases"></a>7. Use cases</h2>
+<div class="sectionbody">
 <div class="quoteblock">
 <blockquote>
 Event Sourcing is an alternative way to persist data. In contrast with state-oriented persistence that only keeps
@@ -84,8 +1405,8 @@ deposited or withdraw and finally when the event happened. Storing data this way
 </li>
 </ul>
 </div>
-<div class="sect3">
-<h4 id="_historical_review"><a class="anchor" href="#_historical_review"></a>1.1.1. Historical Review</h4>
+<div class="sect2">
+<h3 id="_historical_review"><a class="anchor" href="#_historical_review"></a>7.1. Historical Review</h3>
 <div class="paragraph">
 <p>Marting Fowler <a href="https://martinfowler.com/eaaDev/EventSourcing.html">highlights historical review features</a>
 of event sourcing:</p>
@@ -115,8 +1436,8 @@ event we can answer that question:</p>
 </div>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_heterogeneous_uses"><a class="anchor" href="#_heterogeneous_uses"></a>1.1.2. Heterogeneous Uses</h4>
+<div class="sect2">
+<h3 id="_heterogeneous_uses"><a class="anchor" href="#_heterogeneous_uses"></a>7.2. Heterogeneous Uses</h3>
 <div class="paragraph">
 <p>Another use case is <strong>when the data the system is producing is being consumed in different ways by different systems</strong>.</p>
 </div>
@@ -139,8 +1460,8 @@ From there any reading system could read from the event store and then create th
 </div>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_resources"><a class="anchor" href="#_resources"></a>1.1.3. Resources</h4>
+<div class="sect2">
+<h3 id="_resources"><a class="anchor" href="#_resources"></a>7.3. Resources</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -156,176 +1477,125 @@ From there any reading system could read from the event store and then create th
 </div>
 </div>
 </div>
+</div>
+<div class="sect1">
+<h2 id="_implementations"><a class="anchor" href="#_implementations"></a>8. Implementations</h2>
+<div class="sectionbody">
 <div class="sect2">
-<h3 id="_overview"><a class="anchor" href="#_overview"></a>1.2. Overview</h3>
-<div class="paragraph">
-<p>A Memento <code>EventStore</code> instance is built on top of these three components:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><strong>STORAGE</strong>: were events and snapshots are going to be stored (database, csv&#8230;&#8203;)</p>
-</li>
-<li>
-<p><strong>EVENT-BUS</strong>:: system to notify when events/snapshots are stored</p>
-</li>
-<li>
-<p><strong>SERDE</strong>: (serialization/deserialization) how to serialize/deserialize events to/from the storage</p>
-</li>
-</ul>
-</div>
+<h3 id="_csv"><a class="anchor" href="#_csv"></a>8.1. CSV</h3>
 <div class="sect3">
-<h4 id="_storage"><a class="anchor" href="#_storage"></a>1.2.1. Storage</h4>
-<div class="paragraph">
-<p>Basically where the events are going to be stored. That could be anything, a database, a csv file, queue systems. The
-only thing that matters is that the event information could be stored in such a way it could be later be used again
-to replay the state of the system.</p>
+<h4 id="_usage_2"><a class="anchor" href="#_usage_2"></a>8.1.1. Usage</h4>
+<div class="listingblock">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation <span class="string"><span class="delimiter">'</span><span class="content">com.github.grooviter:memento-csv:$VERSION</span><span class="delimiter">'</span></span>
+}</code></pre>
 </div>
-<div class="paragraph">
-<p>The event structure is:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>ID</p>
-</li>
-<li>
-<p>AGGREGATE ID</p>
-</li>
-<li>
-<p>VERSION</p>
-</li>
-<li>
-<p>JSON</p>
-</li>
-<li>
-<p>DATE</p>
-</li>
-</ul>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_event_bus"><a class="anchor" href="#_event_bus"></a>1.2.2. Event Bus</h4>
+<h4 id="_example"><a class="anchor" href="#_example"></a>8.1.2. Example</h4>
 <div class="paragraph">
-<p>Regarding that the event store is more used for reading than writing, there could be many systems that are interested
-in knowing when a new event has been stored in the system. In order to be able to publish notifications the event store
-uses an event bus. An event bus is a system that delivers messages from message producers to message receivers.</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_serde"><a class="anchor" href="#_serde"></a>1.2.3. SERDE</h4>
-<div class="paragraph">
-<p>Because the payload of the event is JSON, we need to convert the event information to JSON and then re-create the
-object from that JSON. Serde is an acronym for <strong>SER</strong>ialization/<strong>DE</strong>serialization.</p>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_getting_started"><a class="anchor" href="#_getting_started"></a>2. Getting started</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>The following example presents a <strong>Document</strong> aggregate, the Document can support different types of events such as <strong>creating a document</strong> (Created)
-or <strong>appending text</strong> to the document (Appended).</p>
-</div>
-<div class="paragraph">
-<p>Also an <strong>EventStore</strong> implementation is created to store the aggregate events. This particular implementation stores events
-and snapshots <strong>as csv files</strong>.</p>
+<p>You can create a basic CSV backed EventStore by using the <code>memento-csv</code> module:</p>
 </div>
 <div class="listingblock">
-<div class="title">save an aggregate</div>
+<div class="title">Basic CSV EventStore</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy"><span class="annotation">@Grab</span>(<span class="string"><span class="delimiter">'</span><span class="content">io.grooviter:memento-base:0.1.0</span><span class="delimiter">'</span></span>)
-<span class="keyword">import</span> <span class="include">io.grooviter.memento.*</span>
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="annotation">@Grab</span>(<span class="string"><span class="delimiter">'</span><span class="content">com.github.grooviter:memento-csv:$VERSION</span><span class="delimiter">'</span></span>)
+<span class="keyword">import</span> <span class="include">memento.*</span>
 
-<span class="comment">// EVENTS....</span>
-<span class="type">class</span> <span class="class">Created</span> <span class="directive">extends</span> <span class="predefined-type">Event</span> {
-   <span class="predefined-type">String</span> title, author
-}
-
-<span class="type">class</span> <span class="class">Appended</span> <span class="directive">extends</span> <span class="predefined-type">Event</span> {
-   <span class="predefined-type">String</span> content
-}
-
-<span class="comment">// AGGREGATE...</span>
-<span class="type">class</span> <span class="class">Document</span> <span class="directive">extends</span> Aggregate {
-   <span class="predefined-type">String</span> title, author, content
-
-   <span class="directive">static</span> <span class="predefined-type">Document</span> create(<span class="predefined-type">String</span> title, <span class="predefined-type">String</span> author) {
-       <span class="predefined-type">Document</span> document = <span class="keyword">new</span> <span class="predefined-type">Document</span>(<span class="key">id</span>: <span class="predefined-type">UUID</span>.randomUUID())
-       <span class="keyword">return</span> document.apply(<span class="keyword">new</span> Created(<span class="key">title</span>: title, <span class="key">author</span>: author, <span class="key">version</span>: nextVersion))
-   }
-
-   <span class="predefined-type">Document</span> append(<span class="predefined-type">String</span> content) {
-       <span class="keyword">return</span> <span class="local-variable">this</span>.apply(<span class="keyword">new</span> Appended(<span class="key">content</span>: <span class="string"><span class="delimiter">&quot;</span><span class="inline"><span class="inline-delimiter">${</span><span class="local-variable">this</span>.content<span class="inline-delimiter">}</span></span><span class="content"> </span><span class="inline"><span class="inline-delimiter">$</span>content</span><span class="delimiter">&quot;</span></span>, <span class="key">version</span>: nextVersion))
-   }
-
-   <span class="predefined-type">Document</span> apply(Created created) {
-       <span class="local-variable">super</span>.apply(created)
-       <span class="local-variable">this</span>.title = created.title
-       <span class="local-variable">this</span>.author = created.author
-       <span class="keyword">return</span> <span class="local-variable">this</span>
-   }
-
-   <span class="predefined-type">Document</span> apply(Appended appended) {
-       <span class="local-variable">super</span>.apply(appended)
-       <span class="local-variable">this</span>.content += appended.content
-       <span class="keyword">return</span> <span class="local-variable">this</span>
-   }
-}
-
-<span class="comment">// EVENTSTORE IMPLEMENTATION...</span>
 EventStore eventStore = Memento.builder()
-    .csvEventStorage(<span class="string"><span class="delimiter">'</span><span class="content">/tmp/events.csv</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">/tmp/snapshots.csv</span><span class="delimiter">'</span></span>)
-    .snapshotThreshold(<span class="integer">2</span>) <span class="comment">// snapshot every 2 events</span>
-    .build()
-
-<span class="comment">// CREATING AND STORING AN AGGREGATE....</span>
-<span class="predefined-type">Document</span> document = <span class="predefined-type">Document</span>.create(<span class="string"><span class="delimiter">&quot;</span><span class="content">Memento</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Christopher Nolan</span><span class="delimiter">&quot;</span></span>)
-    .append(<span class="string"><span class="delimiter">&quot;</span><span class="content">A man who, as a result of an injury,</span><span class="delimiter">&quot;</span></span>)
-    .append(<span class="string"><span class="delimiter">&quot;</span><span class="content">, has anterograde amnesia</span><span class="delimiter">&quot;</span></span>)
-    .append(<span class="string"><span class="delimiter">&quot;</span><span class="content">and has short-term memory loss</span><span class="delimiter">&quot;</span></span>)
-    .append(<span class="string"><span class="delimiter">&quot;</span><span class="content">approximately every fifteen minutes.</span><span class="delimiter">&quot;</span></span>)
-
-<span class="comment">// SAVING THE AGGREGATE's EVENTS...</span>
-eventStore.save(document)</code></pre>
+    .csvStorage(<span class="string"><span class="delimiter">'</span><span class="content">/tmp/events.csv</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">/tmp/snapshots.csv</span><span class="delimiter">'</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
+    .snapshotThreshold(<span class="integer">2</span>) <i class="conum" data-value="2"></i><b>(2)</b>
+    .build()</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>If you take a look at the <strong>events.csv</strong> file you will see the following.</p>
+<p>This creates a new <code>EventStore</code> persisting both events and snapshots in csv files:</p>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>declares files where events and snapshots will be persisted (events.csv and snapshots.csv)</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>stores a new snapshot every 2 events</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Event is stored as a new line in the csv file, and the event payload will be serialized as JSON</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_micronaut_data_jdbc"><a class="anchor" href="#_micronaut_data_jdbc"></a>8.2. Micronaut Data (jdbc)</h3>
+<div class="sect3">
+<h4 id="_usage_3"><a class="anchor" href="#_usage_3"></a>8.2.1. Usage</h4>
+<div class="paragraph">
+<p>In order to use <code>memento-micronaut-jdbc</code> in your Gradle project:</p>
 </div>
 <div class="listingblock">
-<div class="title">events.csv</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="shell">...-6740974752dc|1|DocumentCreated|{&quot;title&quot;:&quot;Memento&quot;,&quot;aggregateId&quot;:&quot;5f5469ba-a031-4ccb...
-...-6740974752dc|2|Appended|{&quot;content&quot;:&quot;A man who, as a result of an injury&quot;,&quot;aggregate...
-...</code></pre>
+<pre class="CodeRay highlight"><code data-lang="groovy">repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation <span class="string"><span class="delimiter">'</span><span class="content">com.github.grooviter:memento-micronaut-jdbc:$VERSION</span><span class="delimiter">'</span></span>
+}</code></pre>
+</div>
+</div>
 </div>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_general_usage"><a class="anchor" href="#_general_usage"></a>3. General Usage</h2>
+<h2 id="_samples"><a class="anchor" href="#_samples"></a>9. Samples</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>TODO</p>
+<p>There are several examples in the Github Repository in the <a href="https://github.com/grooviter/memento/tree/master/samples">samples folder</a>:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://github.com/grooviter/memento/tree/master/samples/memento-guide">Samples included in the guide</a></p>
+</li>
+<li>
+<p><a href="https://github.com/grooviter/memento/tree/master/samples/memento-bank">Bank CLI application</a></p>
+</li>
+<li>
+<p><a href="https://github.com/grooviter/memento/tree/master/samples/memento-cargo">Delivery application</a></p>
+</li>
+</ul>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_micronaut_data"><a class="anchor" href="#_micronaut_data"></a>4. Micronaut Data</h2>
+<h2 id="_license"><a class="anchor" href="#_license"></a>10. License</h2>
 <div class="sectionbody">
+<div class="sidebarblock">
+<div class="content">
+<div class="title">Apache 2.0</div>
 <div class="paragraph">
-<p>TODO</p>
+<p><strong>Memento</strong> is an open source project and its licensed under the <a href="http://www.apache.org/licenses/LICENSE-2.0.html">Apache 2 License</a>.</p>
+</div>
+</div>
 </div>
 </div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 0.1.0-SNAPSHOT<br>
-Last updated 2021-05-11 17:08:53 +0200
+Version 0.1.0<br>
+Last updated 2024-11-11 09:38:02 UTC
 </div>
 </div>
 <link rel="stylesheet" href="./coderay-asciidoctor.css">
